@@ -1,11 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import { Avatar } from '@/components/ui';
 
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/dashboard')) {
+    return null;
+  }
 
   const getDashboardLink = () => {
     const roleType = user?.role?.type;
@@ -19,18 +26,21 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
+    <nav className="bg-card border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-2xl font-extrabold text-blue-600 tracking-tight">
-              LMS<span className="text-gray-900">Platform</span>
+            <Link href="/" className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg accent-bg text-white flex items-center justify-center">
+                <span className="font-extrabold text-sm">LMS</span>
+              </div>
+              <span>Platform</span>
             </Link>
             <div className="hidden md:flex ml-10 space-x-8">
-              <Link href="/courses" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+              <Link href="/courses" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Courses
               </Link>
-              <Link href="/blog" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+              <Link href="/blog" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Blog
               </Link>
             </div>
@@ -43,25 +53,24 @@ export default function Navbar() {
                   <>
                     <Link 
                       href={getDashboardLink()}
-                      className="px-4 py-2 bg-blue-50 text-blue-700 font-semibold rounded-lg hover:bg-blue-100 transition-colors"
                     >
-                      Dashboard
+                      <button className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] bg-muted text-foreground hover:bg-muted/80">
+                        Dashboard
+                      </button>
                     </Link>
                     <div className="relative group">
-                      <button className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-50 transition-colors border border-transparent focus:border-gray-200 outline-none">
-                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
-                          {user.username?.[0]?.toUpperCase() || 'U'}
-                        </div>
+                      <button className="flex items-center gap-2 p-1 rounded-full hover:bg-muted transition-colors border border-transparent focus:border-border outline-none">
+                        <Avatar name={user.username || 'User'} size={32} tone="var(--accent, #4f46e5)" />
                       </button>
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col py-2">
-                        <div className="px-4 py-2 border-b border-gray-50 mb-2">
-                          <p className="font-bold text-gray-900 truncate">{user.username}</p>
-                          <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                          <p className="text-xs text-blue-600 font-semibold mt-1 uppercase tracking-wider">{user.role?.name}</p>
+                      <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col py-2">
+                        <div className="px-4 py-2 border-b border-border mb-2">
+                          <p className="font-semibold text-foreground truncate text-sm">{user.username}</p>
+                          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                          <p className="text-xs accent-text font-semibold mt-1 uppercase tracking-wider">{user.role?.name}</p>
                         </div>
                         <button 
                           onClick={logout}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left transition-colors"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-danger hover:bg-muted text-left transition-colors w-full"
                         >
                           <LogOut className="w-4 h-4" />
                           Logout
@@ -73,15 +82,17 @@ export default function Navbar() {
                   <>
                     <Link 
                       href="/login" 
-                      className="text-gray-600 hover:text-blue-600 font-semibold transition-colors"
                     >
-                      Log in
+                      <button className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground">
+                        Log in
+                      </button>
                     </Link>
                     <Link 
                       href="/register" 
-                      className="px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
                     >
-                      Sign up
+                      <button className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] accent-bg text-white hover:brightness-110">
+                        Sign up
+                      </button>
                     </Link>
                   </>
                 )}

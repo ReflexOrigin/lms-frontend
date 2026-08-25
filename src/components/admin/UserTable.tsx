@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateUserRole, deleteUser } from '@/lib/actions/admin';
-import { Loader2, Trash2, CheckCircle } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
+import { Card, Avatar, Select, Button, useToast, Badge } from '@/components/ui';
 
 type UserTableProps = {
   users: any[];
@@ -14,6 +15,7 @@ export default function UserTable({ users: initialUsers, roles }: UserTableProps
   const [users, setUsers] = useState(initialUsers);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const router = useRouter();
+  const toast = useToast();
 
   const handleRoleChange = async (userId: string, newRoleId: number) => {
     setLoadingId(userId);
@@ -23,8 +25,9 @@ export default function UserTable({ users: initialUsers, roles }: UserTableProps
         u.documentId === userId ? { ...u, role: roles.find(r => r.id === newRoleId) } : u
       ));
       router.refresh();
+      toast("Role updated successfully", "success");
     } catch (err: any) {
-      alert(err.message || 'Failed to update role');
+      toast(err.message || 'Failed to update role', "danger");
     } finally {
       setLoadingId(null);
     }
@@ -37,57 +40,62 @@ export default function UserTable({ users: initialUsers, roles }: UserTableProps
       await deleteUser(userId);
       setUsers(users.filter(u => u.documentId !== userId));
       router.refresh();
+      toast("User deleted successfully", "success");
     } catch (err: any) {
-      alert(err.message || 'Failed to delete user');
+      toast(err.message || 'Failed to delete user', "danger");
     } finally {
       setLoadingId(null);
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+    <Card className="overflow-hidden">
+      <div className="table-container">
+        <table>
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="p-4 font-bold text-gray-700">User</th>
-              <th className="p-4 font-bold text-gray-700">Email</th>
-              <th className="p-4 font-bold text-gray-700">Joined</th>
-              <th className="p-4 font-bold text-gray-700 w-48">Role</th>
-              <th className="p-4 font-bold text-gray-700 text-right">Actions</th>
+            <tr className="bg-muted border-b border-border">
+              <th className="font-semibold text-muted-foreground text-sm">User</th>
+              <th className="font-semibold text-muted-foreground text-sm">Email</th>
+              <th className="font-semibold text-muted-foreground text-sm">Joined</th>
+              <th className="font-semibold text-muted-foreground text-sm w-48">Role</th>
+              <th className="font-semibold text-muted-foreground text-sm text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user.documentId} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <tr key={user.documentId} className="border-b border-border hover:bg-muted transition-colors">
                 <td className="p-4">
-                  <div className="font-bold text-gray-900">{user.username}</div>
+                  <div className="flex items-center gap-3">
+                    <Avatar name={user.username || 'User'} size={32} />
+                    <div className="font-medium text-foreground">{user.username}</div>
+                  </div>
                 </td>
-                <td className="p-4 text-gray-600">{user.email}</td>
-                <td className="p-4 text-gray-500 text-sm">
+                <td className="p-4 text-muted-foreground text-sm">{user.email}</td>
+                <td className="p-4 text-muted-foreground text-sm">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="p-4">
-                  <select
+                  <Select
                     value={user.role?.id || ''}
                     onChange={(e) => handleRoleChange(user.documentId, parseInt(e.target.value))}
                     disabled={loadingId === user.documentId}
-                    className="w-full p-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
                     {roles.map(r => (
                       <option key={r.id} value={r.id}>{r.name}</option>
                     ))}
-                  </select>
+                  </Select>
                 </td>
                 <td className="p-4 text-right">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleDelete(user.documentId)}
                     disabled={loadingId === user.documentId}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors inline-block disabled:opacity-50"
                     title="Delete User"
+                    className="text-danger hover:bg-danger-soft hover:text-danger"
                   >
-                    {loadingId === user.documentId ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                  </button>
+                    {loadingId === user.documentId ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -95,8 +103,8 @@ export default function UserTable({ users: initialUsers, roles }: UserTableProps
         </table>
       </div>
       {users.length === 0 && (
-        <div className="p-8 text-center text-gray-500">No users found.</div>
+        <div className="p-8 text-center text-muted-foreground text-sm">No users found.</div>
       )}
-    </div>
+    </Card>
   );
 }
