@@ -35,11 +35,20 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
+    // Fetch user with role populated
+    const userRes = await fetch(`${STRAPI_URL}/api/users/me?populate=role`, {
+      headers: {
+        'Authorization': `Bearer ${data.jwt}`
+      }
+    });
+    const populatedUser = await userRes.json();
+    const roleType = populatedUser?.role?.type;
+
     // Set role cookie (not httpOnly so client can read it for UI, and middleware can read it)
-    if (data.user?.role?.type) {
+    if (roleType) {
       cookieStore.set({
         name: 'user_role',
-        value: data.user.role.type,
+        value: roleType,
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -49,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Return the user without the JWT (it's safe in the cookie)
-    return NextResponse.json({ user: data.user });
+    return NextResponse.json({ user: populatedUser });
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
