@@ -1,77 +1,91 @@
-import { getCourses } from '@/lib/actions/course';
-import Link from 'next/link';
+"use client";
+import Link from "next/link";
+import { Award, TrendingUp, Users } from "lucide-react";
+import { Page } from "@/components/Page";
+import { courses, studentProgress, unsplash } from "@/data";
+import { Badge, Button, Card, CardHeader, StatCard, StatusPill } from "@/components/ui";
 
-// Since this is a server component in a protected route, it will only render if the user is an instructor.
-// The `getCourses` action will automatically use the JWT from the cookie, which will filter to their own courses
-// because of our backend Layer 2 Controller Override!
+// Instructor sees only their own courses (Aisha Rahman = u1).
+export const myCourses = courses.filter((c) => c.instructorId === "u1");
 
-export default async function InstructorDashboard() {
-  const courses = await getCourses();
+export default function InstructorDashboard() {
+  const totalStudents = myCourses.reduce((s, c) => s + c.students, 0);
+  const avgCompletion = Math.round(myCourses.reduce((s, c) => s + c.completion, 0) / myCourses.length);
+  const avgQuiz = Math.round(myCourses.reduce((s, c) => s + c.quizAvg, 0) / myCourses.length);
+  const atRisk = studentProgress.filter((s) => s.atRisk).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-4xl font-extrabold text-gray-900">Instructor Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage your courses, lessons, and students.</p>
-        </div>
-        <Link 
-          href="/courses/create"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
-        >
-          + Create New Course
+    <Page
+      title="Welcome back, Aisha"
+      subtitle="Here's how your courses and students are doing."
+      actions={
+        <Link href="/instructor/progress">
+          <Button>
+            <TrendingUp size={16} /> Student progress
+          </Button>
         </Link>
+      }
+    >
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="My Courses" value={myCourses.length} accentIcon icon={<Award size={16} />} />
+        <StatCard label="Total Students" value={totalStudents.toLocaleString()} icon={<Users size={16} />} delta={{ value: "18 this week", up: true }} />
+        <StatCard label="Avg. Completion" value={`${avgCompletion}%`} delta={{ value: "2.4%", up: true }} />
+        <StatCard label="Avg. Quiz Score" value={`${avgQuiz}%`} delta={{ value: "0.8%", up: false }} />
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">My Courses</h2>
-        
-        {courses.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-            <p className="text-gray-500 mb-4">You haven't created any courses yet.</p>
-            <Link href="/courses/create" className="text-blue-600 font-semibold hover:underline">
-              Create your first course
-            </Link>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-500">
-              <thead className="bg-gray-50 text-gray-700 uppercase">
-                <tr>
-                  <th scope="col" className="px-6 py-3 font-semibold rounded-tl-lg">Title</th>
-                  <th scope="col" className="px-6 py-3 font-semibold">Status</th>
-                  <th scope="col" className="px-6 py-3 font-semibold">Lessons</th>
-                  <th scope="col" className="px-6 py-3 font-semibold rounded-tr-lg">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courses.map((course: any) => (
-                  <tr key={course.documentId} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 font-bold text-gray-900">
-                      {course.title}
-                    </td>
-                    <td className="px-6 py-4">
-                      {course.isPublished ? (
-                        <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-green-200">Published</span>
-                      ) : (
-                        <span className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-yellow-200">Draft</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600">
-                      {/* Requires populated lessons, if not populated it might be undefined */}
-                      {course.lessons?.length || 0}
-                    </td>
-                    <td className="px-6 py-4 space-x-4">
-                      <Link href={`/courses/${course.slug}`} className="text-blue-600 hover:underline font-medium">View</Link>
-                      <Link href={`/courses/${course.slug}/edit`} className="text-blue-600 hover:underline font-medium">Edit</Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      {atRisk > 0 && (
+        <Card className="mt-4 p-4 flex items-center gap-3 border-[var(--color-warning)]/40 bg-[var(--color-warning-soft)]/40">
+          <span className="w-9 h-9 rounded-lg bg-[var(--color-warning-soft)] text-[var(--color-warning)] flex items-center justify-center shrink-0">
+            <TrendingUp size={18} />
+          </span>
+          <p className="text-sm flex-1">
+            <strong>{atRisk} students</strong> across your courses are at risk of falling behind.
+          </p>
+          <Link href="/instructor/progress">
+            <Button size="sm" variant="outline">
+              Review
+            </Button>
+          </Link>
+        </Card>
+      )}
+
+      {/* Course performance cards */}
+      <h2 className="text-lg font-semibold tracking-tight mt-8 mb-4">My Courses</h2>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {myCourses.map((c) => (
+          <Card key={c.id} className="overflow-hidden flex flex-col">
+            <div className="aspect-[16/8] bg-muted overflow-hidden relative">
+              <img src={unsplash(c.thumbId, 480, 240)} alt={c.title} className="w-full h-full object-cover" />
+              <div className="absolute top-3 right-3">
+                <StatusPill status={c.status} />
+              </div>
+            </div>
+            <div className="p-4 flex flex-col flex-1">
+              <h3 className="font-semibold leading-snug">{c.title}</h3>
+              <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+                <div>
+                  <div className="text-lg font-semibold tabular-nums">{c.students}</div>
+                  <div className="text-[11px] text-muted-foreground">Students</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold tabular-nums">{c.completion}%</div>
+                  <div className="text-[11px] text-muted-foreground">Completion</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold tabular-nums">{c.quizAvg}%</div>
+                  <div className="text-[11px] text-muted-foreground">Quiz avg</div>
+                </div>
+              </div>
+              <Link href={`/instructor/courses/${c.slug}`} className="mt-4">
+                <Button variant="outline" className="w-full">
+                  View course
+                </Button>
+              </Link>
+            </div>
+          </Card>
+        ))}
       </div>
-    </div>
+    </Page>
   );
 }
+
