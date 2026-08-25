@@ -1,8 +1,21 @@
 import { getMyEnrollments } from '@/lib/actions/enrollment';
+import { getMyProgresses } from '@/lib/actions/progress';
 import Link from 'next/link';
 
 export default async function StudentDashboard() {
-  const enrollments = await getMyEnrollments();
+  const [enrollments, allProgresses] = await Promise.all([
+    getMyEnrollments().catch(() => []),
+    getMyProgresses().catch(() => [])
+  ]);
+
+  // Group progress by course documentId
+  const progressByCourse = allProgresses.reduce((acc: any, p: any) => {
+    const cid = p.course?.documentId;
+    if (cid && p.completed) {
+      acc[cid] = (acc[cid] || 0) + 1;
+    }
+    return acc;
+  }, {});
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -35,6 +48,10 @@ export default async function StudentDashboard() {
               const course = enrollment.course;
               if (!course) return null;
               
+              const totalLessons = course.lessons?.length || 0;
+              const completedLessons = progressByCourse[course.documentId] || 0;
+              const percent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+              
               return (
                 <div key={enrollment.documentId} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
                   <div className="h-40 bg-gray-100 relative">
@@ -46,15 +63,23 @@ export default async function StudentDashboard() {
                   </div>
                   <div className="p-5 flex-1 flex flex-col">
                     <h3 className="font-bold text-gray-900 mb-2">{course.title}</h3>
-                    <p className="text-xs text-gray-500 mb-4">
-                      Enrolled on {new Date(enrollment.enrolledAt || enrollment.createdAt).toLocaleDateString()}
-                    </p>
+                    
+                    <div className="mb-4">
+                      <div className="flex justify-between text-xs font-semibold text-gray-500 mb-1">
+                        <span>{completedLessons} / {totalLessons} Lessons</span>
+                        <span>{percent}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-green-500 h-2 rounded-full transition-all duration-500" style={{ width: `${percent}%` }}></div>
+                      </div>
+                    </div>
+                    
                     <div className="mt-auto pt-4 border-t border-gray-100">
                       <Link 
                         href={`/courses/${course.slug}/lessons`}
                         className="w-full block text-center bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold py-2 rounded transition-colors"
                       >
-                        Continue Course →
+                        {percent === 100 ? 'Review Course →' : 'Continue Course →'}
                       </Link>
                     </div>
                   </div>

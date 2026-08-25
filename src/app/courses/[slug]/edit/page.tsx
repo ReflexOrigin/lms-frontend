@@ -77,13 +77,21 @@ export default function EditCoursePage(props: { params: Promise<{ slug: string }
 
       <div className="mt-12">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Lessons</h2>
-          <Link 
-            href={`/courses/${slug}/lessons/create`}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-sm"
-          >
-            + Add Lesson
-          </Link>
+          <h2 className="text-2xl font-bold text-gray-900">Lessons & Quiz</h2>
+          <div className="flex gap-3">
+            <Link 
+              href={`/courses/${slug}/quiz/edit`}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors text-sm"
+            >
+              Manage Quiz
+            </Link>
+            <Link 
+              href={`/courses/${slug}/lessons/create`}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-sm"
+            >
+              + Add Lesson
+            </Link>
+          </div>
         </div>
 
         {(!course.lessons || course.lessons.length === 0) ? (

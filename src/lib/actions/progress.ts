@@ -29,25 +29,20 @@ async function fetchWithAuth(path: string, options: RequestInit = {}) {
   return res.json();
 }
 
-export async function getMyEnrollments() {
-  const res = await fetchWithAuth('/enrollments?populate[course][populate]=lessons');
+export async function getCourseProgress(courseId: string) {
+  const res = await fetchWithAuth(`/progresses?filters[course][documentId][$eq]=${courseId}&populate=lesson`);
   return res.data;
 }
 
-export async function checkEnrollment(courseId: number) {
-  // Returns true if enrolled, false otherwise
-  try {
-    const res = await fetchWithAuth(`/enrollments?filters[course][id][$eq]=${courseId}`);
-    return res.data.length > 0;
-  } catch (err) {
-    return false;
-  }
+export async function getMyProgresses() {
+  const res = await fetchWithAuth(`/progresses?populate=course,lesson`);
+  return res.data;
 }
 
-export async function createEnrollment(courseId: number) {
-  const res = await fetchWithAuth('/enrollments', {
+export async function markLessonComplete(courseId: string, lessonId: string) {
+  const res = await fetchWithAuth('/progresses', {
     method: 'POST',
-    body: JSON.stringify({ data: { course: courseId } }),
+    body: JSON.stringify({ data: { course: courseId, lesson: lessonId, completed: true } }),
   });
   return res.data;
 }
