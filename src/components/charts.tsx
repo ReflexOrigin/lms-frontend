@@ -114,10 +114,10 @@ export function LineChart({
       <path d={area} fill="url(#areaFill)" />
       <path d={line} fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
       {data.map((d, i) => (
-        <g key={d.month}>
+        <g key={i}>
           <circle cx={x(i)} cy={y(d.value)} r={3.5} fill="var(--color-card)" stroke={color} strokeWidth={2} />
           <text x={x(i)} y={height - 8} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: 10 }}>
-            {d.month}
+            {d.label || d.month}
           </text>
         </g>
       ))}
@@ -137,8 +137,8 @@ export function BarChart({
   const max = Math.max(...data.map((d) => d.value)) || 1;
   return (
     <div className="flex items-end gap-3" style={{ height }}>
-      {data.map((d) => (
-        <div key={d.label} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+      {data.map((d, idx) => (
+        <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
           <span className="text-xs font-semibold tabular-nums">{d.value}</span>
           <div
             className="w-full rounded-t-md transition-all"

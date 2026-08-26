@@ -3,6 +3,7 @@ import { Eye, Filter, Pencil, Search, Trash2 } from "lucide-react";
 import { Page, NewButton } from "@/components/Page";
 import { Button, Card, StatusPill } from "@/components/ui";
 import { fetchWithAuth } from "@/lib/api";
+import CourseFilter from "./CourseFilter";
 
 export default async function AdminCourses({ searchParams }: { searchParams: any }) {
   const query = searchParams?.q?.toLowerCase() || "";
@@ -44,36 +45,14 @@ export default async function AdminCourses({ searchParams }: { searchParams: any
       actions={<NewButton label="Create course" />}
     >
       <Card className="overflow-hidden">
-        <form className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 border-b border-border">
-          <div className="relative sm:col-span-2 lg:col-span-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input 
-              name="q"
-              defaultValue={query}
-              placeholder="Search courses" 
-              className="w-full h-9 pl-9 pr-3 rounded-lg border border-border bg-transparent text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all" 
-            />
-          </div>
-          <select name="status" defaultValue={statusFilter} onChange={(e) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-border bg-card text-sm outline-none">
-            <option value="all">All statuses</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
-            <option value="archived">Archived</option>
-          </select>
-          <select name="instructor" defaultValue={instructorFilter} onChange={(e) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-border bg-card text-sm outline-none">
-            <option value="all">All instructors</option>
-            {instructors.map((i: any) => (
-              <option key={i} value={i}>{i}</option>
-            ))}
-          </select>
-          <select name="category" defaultValue={categoryFilter} onChange={(e) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-border bg-card text-sm outline-none">
-            <option value="all">All categories</option>
-            {cats.map((c: any) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-          <noscript><button type="submit" className="hidden">Filter</button></noscript>
-        </form>
+        <CourseFilter 
+          query={query}
+          statusFilter={statusFilter}
+          instructorFilter={instructorFilter}
+          categoryFilter={categoryFilter}
+          instructors={instructors as string[]}
+          cats={cats as string[]}
+        />
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[860px]">

@@ -14,7 +14,7 @@ export default async function ManagerDashboard() {
     const [coursesRes, enrollmentsRes, blogsRes] = await Promise.all([
       fetchWithAuth('/api/courses?populate=lessons'),
       fetchWithAuth('/api/enrollments'),
-      fetchWithAuth('/api/blogs').catch(() => ({ ok: false, json: () => ({ data: [] }) })) // Fallback if blogs don't exist yet
+      fetchWithAuth('/api/blog-posts').catch(() => ({ ok: false, json: () => ({ data: [] }) })) // Fallback if blogs don't exist yet
     ]);
 
     if (coursesRes.ok) courses = (await coursesRes.json()).data || [];

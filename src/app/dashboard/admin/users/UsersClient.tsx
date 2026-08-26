@@ -46,7 +46,12 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
   if (roleFilter !== "all") {
     list = list.filter((u) => {
       const normalizedRole = u.role?.name?.toLowerCase() || 'student';
-      return normalizedRole.includes(roleFilter);
+      let mappedRole = "student";
+      if (normalizedRole.includes("admin")) mappedRole = "admin";
+      else if (normalizedRole.includes("manager")) mappedRole = "manager";
+      else if (normalizedRole.includes("instructor")) mappedRole = "instructor";
+      
+      return mappedRole === roleFilter;
     });
   }
   if (query) {

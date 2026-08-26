@@ -72,6 +72,7 @@ export function LearningCard({
   lastLesson: string;
   href: string;
 }) {
+  if (!course) return null;
   const instructorName = typeof course.instructor === 'string' ? course.instructor : course.instructor?.username || course.instructor?.name || "Instructor";
   const lessonCount = course.lessons?.length || 0;
 

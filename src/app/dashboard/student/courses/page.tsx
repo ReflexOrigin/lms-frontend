@@ -1,15 +1,12 @@
-import Link from "next/link";
-import { Compass } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { Page } from "@/components/Page";
-import { DiscoveryCard } from "@/components/CourseCard";
-import { Button, EmptyState } from "@/components/ui";
-import { getCourses } from "@/lib/services/courseService";
+import { LearningCard } from "@/components/CourseCard";
+import { EmptyState } from "@/components/ui";
 import { fetchWithAuth } from "@/lib/api";
+import Link from "next/link";
+import { Button } from "@/components/ui";
 
-export default async function StudentCoursesPage() {
-  const publishedCourses = await getCourses();
-  
-  // Fetch enrollments to determine progress mapping
+export default async function MyCoursesPage() {
   let enrolled: any[] = [];
   try {
     const res = await fetchWithAuth('/api/enrollments?populate=course');
@@ -17,38 +14,35 @@ export default async function StudentCoursesPage() {
       const data = await res.json();
       enrolled = data.data || [];
     }
-  } catch (e) {}
-
-  const progressMap = enrolled.reduce((acc, curr) => {
-    if (curr.course?.documentId) {
-      acc[curr.course.documentId] = curr.progressPercentage || 0;
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  } catch (error) {
+    console.error("Failed to fetch enrollments", error);
+  }
 
   return (
-    <Page title="Course Library" subtitle="Discover new skills and knowledge.">
-      <div className="flex items-center gap-4 mb-6 text-sm">
-        <button className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full font-medium">All Courses</button>
-        <button className="text-gray-500 hover:text-gray-900 font-medium">Data Science</button>
-        <button className="text-gray-500 hover:text-gray-900 font-medium">Programming</button>
-      </div>
-      
-      {publishedCourses.length > 0 ? (
+    <Page title="My Courses" subtitle="Continue your learning journey.">
+      {enrolled.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {publishedCourses.map((course) => (
-            <DiscoveryCard
-              key={course.documentId}
-              course={course as any}
-              href={`/courses/${course.slug || course.documentId}`}
+          {enrolled.map((m: any) => (
+            <LearningCard
+              key={m.documentId}
+              course={m.course}
+              progress={m.progressPercentage || 0}
+              lessonsCompleted={0}
+              lastLesson={"Next Lesson"}
+              href={`/courses/${m.course?.slug || m.course?.documentId}`}
             />
           ))}
         </div>
       ) : (
         <EmptyState
-          icon={<Compass size={24} />}
-          title="No courses available"
-          description="There are currently no published courses in the library."
+          icon={<GraduationCap size={24} />}
+          title="No courses yet"
+          description="You haven't enrolled in any courses. Check out the library to get started!"
+          action={
+            <Link href="/dashboard/student/explore">
+              <Button>Explore Courses</Button>
+            </Link>
+          }
         />
       )}
     </Page>

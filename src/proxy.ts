@@ -8,7 +8,7 @@ export function proxy(request: NextRequest) {
 
   // Normalize Strapi default roles to our LMS roles
   if (userRole === 'authenticated') userRole = 'student';
-  if (userRole === 'administrator') userRole = 'admin';
+  if (userRole === 'administrator' || userRole === 'admin_role') userRole = 'admin';
   if (userRole === 'content_manager') userRole = 'manager';
 
   // 1. If not logged in and trying to access a dashboard, redirect to login

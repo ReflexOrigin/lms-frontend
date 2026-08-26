@@ -58,7 +58,7 @@ export default async function StudentDashboard() {
         <Card className="p-8 text-center bg-blue-50 border-blue-100 border-dashed">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">No active enrollments</h3>
           <p className="text-blue-700/80 mb-6">You haven't enrolled in any courses yet. Explore the library to start learning.</p>
-          <Link href="/dashboard/student/courses">
+          <Link href="/dashboard/student/explore">
             <Button>Browse Courses</Button>
           </Link>
         </Card>

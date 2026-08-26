@@ -127,6 +127,7 @@ const statusTone: Record<string, Tone> = {
 };
 
 export function StatusPill({ status }: { status: string }) {
+  if (!status) return null;
   const tone = statusTone[status.toLowerCase()] ?? "neutral";
   const label = status.charAt(0).toUpperCase() + status.slice(1);
   return (

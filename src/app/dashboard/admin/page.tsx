@@ -24,7 +24,7 @@ export default async function AdminDashboard() {
       fetchWithAuth('/api/courses?populate=instructor,lessons'),
       fetchWithAuth('/api/users?populate=role'),
       fetchWithAuth('/api/enrollments'),
-      fetchWithAuth('/api/blogs').catch(() => ({ ok: false, json: () => ({ data: [] }) }))
+      fetchWithAuth('/api/blog-posts').catch(() => ({ ok: false, json: () => ({ data: [] }) }))
     ]);
 
     if (coursesRes.ok) courses = (await coursesRes.json()).data || [];
@@ -51,13 +51,24 @@ export default async function AdminDashboard() {
     { label: "Admins", value: roleCounts.admins, color: "#4f46e5" },
   ].filter(d => d.value > 0);
   
-  // Dummy data for charts since we don't have historical timeseries data in Strapi yet
-  const enrollmentTrend = [
-    { label: "Jan", value: 120 }, { label: "Feb", value: 150 },
-    { label: "Mar", value: 180 }, { label: "Apr", value: 220 },
-    { label: "May", value: 270 }, { label: "Jun", value: 310 },
-    { label: "Jul", value: 380 }, { label: "Aug", value: 450 },
-  ];
+  // Generate the last 6 months for the trend chart
+  const currentMonthIdx = new Date().getMonth();
+  const enrollmentTrend = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(currentMonthIdx - i);
+    enrollmentTrend.push({ label: d.toLocaleString('default', { month: 'short' }), value: 0 });
+  }
+
+  // Populate actual enrollment counts
+  enrollments.forEach(e => {
+    const date = new Date(e.enrolledAt || e.createdAt || new Date());
+    const month = date.toLocaleString('default', { month: 'short' });
+    const trendItem = enrollmentTrend.find(t => t.label === month);
+    if (trendItem) {
+      trendItem.value += 1;
+    }
+  });
 
   const recentActivity = [
     { id: '1', kind: 'user', text: `${users[users.length-1]?.username || 'A new user'} joined the platform.`, time: 'Recently' },

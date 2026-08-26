@@ -35,7 +35,7 @@ export default function LoginForm() {
       // Redirect based on role
       let roleType = data.user?.role?.type?.toLowerCase() || 'student';
       if (roleType === 'authenticated') roleType = 'student';
-      if (roleType === 'administrator') roleType = 'admin';
+      if (roleType === 'administrator' || roleType === 'admin_role') roleType = 'admin';
       if (roleType === 'content_manager') roleType = 'manager';
 
       if (['admin', 'manager', 'instructor', 'student'].includes(roleType)) {
