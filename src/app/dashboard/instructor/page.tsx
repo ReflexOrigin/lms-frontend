@@ -1,25 +1,31 @@
-"use client";
 import Link from "next/link";
 import { Award, TrendingUp, Users } from "lucide-react";
 import { Page } from "@/components/Page";
-import { courses, studentProgress, unsplash } from "@/data";
 import { Badge, Button, Card, CardHeader, StatCard, StatusPill } from "@/components/ui";
+import { getCourses } from "@/lib/services/courseService";
+import { getCurrentUser } from "@/lib/services/userService";
 
-// Instructor sees only their own courses (Aisha Rahman = u1).
-export const myCourses = courses.filter((c) => c.instructorId === "u1");
+export default async function InstructorDashboard() {
+  const user = await getCurrentUser();
+  const myCourses = await getCourses(); // Backend auto-filters by instructor
 
-export default function InstructorDashboard() {
-  const totalStudents = myCourses.reduce((s, c) => s + c.students, 0);
-  const avgCompletion = Math.round(myCourses.reduce((s, c) => s + c.completion, 0) / myCourses.length);
-  const avgQuiz = Math.round(myCourses.reduce((s, c) => s + c.quizAvg, 0) / myCourses.length);
-  const atRisk = studentProgress.filter((s) => s.atRisk).length;
+  const totalStudents = myCourses.reduce((s, c) => s + (c.students || 0), 0);
+  const avgCompletion = myCourses.length 
+    ? Math.round(myCourses.reduce((s, c) => s + (c.completion || 0), 0) / myCourses.length) 
+    : 0;
+  const avgQuiz = myCourses.length 
+    ? Math.round(myCourses.reduce((s, c) => s + (c.quizAvg || 0), 0) / myCourses.length) 
+    : 0;
+  
+  // Dummy fallback for atRisk since we don't have a progress API endpoint fully built in UI yet
+  const atRisk = 0;
 
   return (
     <Page
-      title="Welcome back, Aisha"
+      title={`Welcome back, ${user?.username || 'Instructor'}`}
       subtitle="Here's how your courses and students are doing."
       actions={
-        <Link href="/instructor/progress">
+        <Link href="/dashboard/instructor/progress">
           <Button>
             <TrendingUp size={16} /> Student progress
           </Button>
@@ -28,9 +34,9 @@ export default function InstructorDashboard() {
     >
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="My Courses" value={myCourses.length} accentIcon icon={<Award size={16} />} />
-        <StatCard label="Total Students" value={totalStudents.toLocaleString()} icon={<Users size={16} />} delta={{ value: "18 this week", up: true }} />
-        <StatCard label="Avg. Completion" value={`${avgCompletion}%`} delta={{ value: "2.4%", up: true }} />
-        <StatCard label="Avg. Quiz Score" value={`${avgQuiz}%`} delta={{ value: "0.8%", up: false }} />
+        <StatCard label="Total Students" value={totalStudents.toLocaleString()} icon={<Users size={16} />} />
+        <StatCard label="Avg. Completion" value={`${avgCompletion}%`} />
+        <StatCard label="Avg. Quiz Score" value={`${avgQuiz}%`} />
       </div>
 
       {atRisk > 0 && (
@@ -41,7 +47,7 @@ export default function InstructorDashboard() {
           <p className="text-sm flex-1">
             <strong>{atRisk} students</strong> across your courses are at risk of falling behind.
           </p>
-          <Link href="/instructor/progress">
+          <Link href="/dashboard/instructor/progress">
             <Button size="sm" variant="outline">
               Review
             </Button>
@@ -51,40 +57,52 @@ export default function InstructorDashboard() {
 
       {/* Course performance cards */}
       <h2 className="text-lg font-semibold tracking-tight mt-8 mb-4">My Courses</h2>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {myCourses.map((c) => (
-          <Card key={c.id} className="overflow-hidden flex flex-col">
-            <div className="aspect-[16/8] bg-muted overflow-hidden relative">
-              <img src={unsplash(c.thumbId, 480, 240)} alt={c.title} className="w-full h-full object-cover" />
-              <div className="absolute top-3 right-3">
-                <StatusPill status={c.status} />
-              </div>
-            </div>
-            <div className="p-4 flex flex-col flex-1">
-              <h3 className="font-semibold leading-snug">{c.title}</h3>
-              <div className="grid grid-cols-3 gap-2 mt-4 text-center">
-                <div>
-                  <div className="text-lg font-semibold tabular-nums">{c.students}</div>
-                  <div className="text-[11px] text-muted-foreground">Students</div>
+      
+      {myCourses.length > 0 ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {myCourses.map((c) => (
+            <Card key={c.documentId} className="overflow-hidden flex flex-col">
+              <div className="aspect-[16/8] bg-muted overflow-hidden relative">
+                <div className="w-full h-full bg-blue-50 flex items-center justify-center">
+                  <span className="text-blue-400 font-medium text-sm">Course Cover</span>
                 </div>
-                <div>
-                  <div className="text-lg font-semibold tabular-nums">{c.completion}%</div>
-                  <div className="text-[11px] text-muted-foreground">Completion</div>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold tabular-nums">{c.quizAvg}%</div>
-                  <div className="text-[11px] text-muted-foreground">Quiz avg</div>
+                <div className="absolute top-3 right-3">
+                  <StatusPill status={c.status} />
                 </div>
               </div>
-              <Link href={`/instructor/courses/${c.slug}`} className="mt-4">
-                <Button variant="outline" className="w-full">
-                  View course
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        ))}
-      </div>
+              <div className="p-4 flex flex-col flex-1">
+                <h3 className="font-semibold leading-snug">{c.title}</h3>
+                <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+                  <div>
+                    <div className="text-lg font-semibold tabular-nums">{c.students || 0}</div>
+                    <div className="text-[11px] text-muted-foreground">Students</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-semibold tabular-nums">{c.completion || 0}%</div>
+                    <div className="text-[11px] text-muted-foreground">Completion</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-semibold tabular-nums">{c.quizAvg || 0}%</div>
+                    <div className="text-[11px] text-muted-foreground">Quiz avg</div>
+                  </div>
+                </div>
+                <Link href={`/dashboard/instructor/courses/${c.slug || c.documentId}`} className="mt-4">
+                  <Button variant="outline" className="w-full">
+                    View course
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card className="p-8 text-center bg-gray-50 border-dashed border-gray-200">
+          <p className="text-gray-500 font-medium mb-4">You haven't authored any courses yet.</p>
+          <Link href="/dashboard/instructor/courses">
+            <Button>Create a Course</Button>
+          </Link>
+        </Card>
+      )}
     </Page>
   );
 }

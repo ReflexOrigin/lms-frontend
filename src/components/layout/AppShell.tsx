@@ -31,11 +31,14 @@ export const personas: Record<Role, Persona> = {
   student: { role: "student", name: "Alex Morgan", email: "alex.morgan@lumen.edu", avatarTone: "#2563eb" },
 };
 
-function Sidebar({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
+function Sidebar({ role, user, onNavigate }: { role: Role; user: any; onNavigate?: () => void }) {
   const cfg = navConfig[role];
   const meta = roleMeta[role];
   const persona = personas[role];
   const pathname = usePathname();
+
+  const displayName = user?.username || persona.name;
+  const displayEmail = user?.email || persona.email;
 
   return (
     <div className="flex flex-col h-full">
@@ -84,10 +87,10 @@ function Sidebar({ role, onNavigate }: { role: Role; onNavigate?: () => void }) 
 
       <div className="p-3 border-t border-border">
         <div className="flex items-center gap-3 px-2 py-1.5">
-          <Avatar name={persona.name} tone={persona.avatarTone} size={34} />
+          <Avatar name={displayName} tone={persona.avatarTone} size={34} />
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-medium truncate">{persona.name}</div>
-            <div className="text-xs text-muted-foreground truncate">{persona.email}</div>
+            <div className="text-sm font-medium truncate">{displayName}</div>
+            <div className="text-xs text-muted-foreground truncate">{displayEmail}</div>
           </div>
         </div>
       </div>
@@ -106,7 +109,7 @@ function crumbsFor(pathname: string) {
 }
 
 export default function AppShell({ role, children }: { role: Role; children: React.ReactNode }) {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
   const [drawer, setDrawer] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -114,12 +117,15 @@ export default function AppShell({ role, children }: { role: Role; children: Rea
   const meta = roleMeta[role];
   const crumbs = crumbsFor(pathname || "");
   const persona = personas[role];
+  
+  const displayName = user?.username || persona.name;
+  const displayEmail = user?.email || persona.email;
 
   return (
     <div data-role={role} className="h-full flex bg-background w-full absolute inset-0 z-50">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex w-64 shrink-0 border-r border-border bg-card">
-        <Sidebar role={role} />
+        <Sidebar role={role} user={user} />
       </aside>
 
       {/* Mobile drawer */}
@@ -133,7 +139,7 @@ export default function AppShell({ role, children }: { role: Role; children: Rea
             >
               <X size={18} />
             </button>
-            <Sidebar role={role} onNavigate={() => setDrawer(false)} />
+            <Sidebar role={role} user={user} onNavigate={() => setDrawer(false)} />
           </aside>
         </div>
       )}
@@ -180,7 +186,7 @@ export default function AppShell({ role, children }: { role: Role; children: Rea
               onClick={() => setMenuOpen((s) => !s)}
               className="flex items-center gap-2 h-9 pl-1 pr-2 rounded-lg hover:bg-muted transition-colors border border-transparent focus:border-border outline-none"
             >
-              <Avatar name={persona.name} tone={persona.avatarTone} size={30} />
+              <Avatar name={displayName} tone={persona.avatarTone} size={30} />
               <span className="hidden sm:block">
                 <Badge tone="accent">{meta.label}</Badge>
               </span>
@@ -191,9 +197,9 @@ export default function AppShell({ role, children }: { role: Role; children: Rea
                 <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                 <div className="absolute right-0 mt-2 w-60 bg-card border border-border rounded-xl shadow-xl z-50 py-2 animate-in">
                   <div className="px-4 py-2 border-b border-border mb-2">
-                    <p className="font-semibold text-foreground truncate text-sm">{persona.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{persona.email}</p>
-                    <p className="text-xs accent-text font-semibold mt-1 uppercase tracking-wider">{meta.label}</p>
+                    <p className="font-semibold text-foreground truncate text-sm">{displayName}</p>
+                    <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
+                    <p className="text-xs accent-text font-semibold mt-1 uppercase tracking-wider">{user?.role?.name || meta.label}</p>
                   </div>
                   <button
                     onClick={() => {

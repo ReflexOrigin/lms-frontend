@@ -33,11 +33,13 @@ export default function LoginForm() {
       setUser(data.user);
       
       // Redirect based on role
-      const roleType = data.user?.role?.type;
-      if (roleType === 'admin_role' || roleType === 'content_manager') {
-        router.push('/dashboard/admin');
-      } else if (roleType === 'instructor') {
-        router.push('/dashboard/instructor');
+      let roleType = data.user?.role?.type?.toLowerCase() || 'student';
+      if (roleType === 'authenticated') roleType = 'student';
+      if (roleType === 'administrator') roleType = 'admin';
+      if (roleType === 'content_manager') roleType = 'manager';
+
+      if (['admin', 'manager', 'instructor', 'student'].includes(roleType)) {
+        router.push(`/dashboard/${roleType}`);
       } else {
         router.push('/dashboard/student');
       }

@@ -1,7 +1,10 @@
 import React from "react";
 import { Plus } from "lucide-react";
-import { Button, cx } from "./ui";
+import { Button } from "./ui";
 
+function cx(...parts: (string | false | null | undefined)[]) {
+  return parts.filter(Boolean).join(" ");
+}
 export function Page({
   title,
   subtitle,

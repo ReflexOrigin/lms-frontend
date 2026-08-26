@@ -5,7 +5,11 @@ import { unsplash, type Course } from "../data";
 import { Avatar, Badge, ProgressBar } from "./ui";
 
 // Marketing / discovery course card (no management controls).
-export function DiscoveryCard({ course, href }: { course: Course; href: string }) {
+export function DiscoveryCard({ course, href }: { course: any; href: string }) {
+  const instructorName = typeof course.instructor === 'string' ? course.instructor : course.instructor?.username || course.instructor?.name || "Instructor";
+  const studentCount = course.students || course.enrollments?.length || 0;
+  const lessonCount = course.lessons?.length || 0;
+
   return (
     <Link
       href={href}
@@ -13,7 +17,7 @@ export function DiscoveryCard({ course, href }: { course: Course; href: string }
     >
       <div className="aspect-[16/9] bg-muted overflow-hidden">
         <img
-          src={unsplash(course.thumbId, 640, 360)}
+          src={unsplash(course.thumbId || course.documentId, 640, 360)}
           alt={course.title}
           className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
           loading="lazy"
@@ -21,20 +25,20 @@ export function DiscoveryCard({ course, href }: { course: Course; href: string }
       </div>
       <div className="p-4 flex flex-col flex-1">
         <div className="flex items-center gap-2 mb-2">
-          <Badge tone="accent">{course.category}</Badge>
+          <Badge tone="accent">{course.category || "General"}</Badge>
           <span className="text-xs text-muted-foreground flex items-center gap-1">
-            <Signal size={13} /> {course.difficulty}
+            <Signal size={13} /> {course.difficulty || "Beginner"}
           </span>
         </div>
         <h3 className="font-semibold leading-snug group-hover:accent-text transition-colors">
           {course.title}
         </h3>
         <p className="text-[13px] text-muted-foreground mt-1.5 line-clamp-2 flex-1">
-          {course.description}
+          {course.description || "No description available."}
         </p>
         <div className="flex items-center gap-2 mt-3.5 pt-3.5 border-t border-border">
-          <Avatar name={course.instructor} tone="#4f46e5" size={24} />
-          <span className="text-xs text-muted-foreground flex-1 truncate">{course.instructor}</span>
+          <Avatar name={instructorName} tone="#4f46e5" size={24} />
+          <span className="text-xs text-muted-foreground flex-1 truncate">{instructorName}</span>
           <span className="text-xs text-muted-foreground flex items-center gap-1">
             <Star size={13} className="fill-[var(--color-warning)] text-[var(--color-warning)]" />
             {course.rating || "New"}
@@ -42,12 +46,12 @@ export function DiscoveryCard({ course, href }: { course: Course; href: string }
         </div>
         <div className="flex items-center gap-4 mt-2.5 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
-            <Clock size={13} /> {course.duration}
+            <Clock size={13} /> {course.duration || "2h"}
           </span>
           <span className="flex items-center gap-1">
-            <Users size={13} /> {course.students.toLocaleString()}
+            <Users size={13} /> {studentCount.toLocaleString()}
           </span>
-          <span>{course.lessons.length} lessons</span>
+          <span>{lessonCount} lessons</span>
         </div>
       </div>
     </Link>
@@ -62,17 +66,20 @@ export function LearningCard({
   lastLesson,
   href,
 }: {
-  course: Course;
+  course: any;
   progress: number;
   lessonsCompleted: number;
   lastLesson: string;
   href: string;
 }) {
+  const instructorName = typeof course.instructor === 'string' ? course.instructor : course.instructor?.username || course.instructor?.name || "Instructor";
+  const lessonCount = course.lessons?.length || 0;
+
   return (
     <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm flex flex-col">
       <div className="aspect-[16/7] bg-muted overflow-hidden relative">
         <img
-          src={unsplash(course.thumbId, 640, 280)}
+          src={unsplash(course.thumbId || course.documentId, 640, 280)}
           alt={course.title}
           className="w-full h-full object-cover"
           loading="lazy"
@@ -83,12 +90,12 @@ export function LearningCard({
       </div>
       <div className="p-4 flex flex-col flex-1">
         <h3 className="font-semibold leading-snug">{course.title}</h3>
-        <p className="text-xs text-muted-foreground mt-1">{course.instructor}</p>
+        <p className="text-xs text-muted-foreground mt-1">{instructorName}</p>
         <div className="mt-3">
           <ProgressBar value={progress} />
           <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
             <span>
-              {lessonsCompleted}/{course.lessons.length} lessons
+              {lessonsCompleted}/{lessonCount} lessons
             </span>
             <span className="truncate ml-2">Next: {lastLesson}</span>
           </div>
