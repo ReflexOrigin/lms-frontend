@@ -26,9 +26,9 @@ export interface StrapiCourse {
 
 export async function getCourses(filters = ''): Promise<StrapiCourse[]> {
   try {
-    // Populate instructor to get their name
-    const query = filters ? `?populate=instructor&${filters}` : '?populate=instructor';
-    const res = await fetchWithAuth(`/api/courses${query}`);
+    // Populate instructor to get their name, and lessons to get lesson count
+    const query = filters ? `?populate=instructor,lessons&${filters}` : '?populate=instructor,lessons';
+    const res = await fetchWithAuth(`/api/courses${query}`, { cache: 'no-store' });
     
     if (!res.ok) {
       console.error(`Course fetch failed with status ${res.status}`);
@@ -48,7 +48,7 @@ export async function getCourses(filters = ''): Promise<StrapiCourse[]> {
 
 export async function getCourseBySlug(slug: string): Promise<StrapiCourse | null> {
   try {
-    const res = await fetchWithAuth(`/api/courses?filters[slug][$eq]=${slug}&populate=*`);
+    const res = await fetchWithAuth(`/api/courses?filters[slug][$eq]=${slug}&populate=*`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch course');
     const data = await res.json();
     return data.data?.[0] || null;

@@ -4,8 +4,7 @@ import { getCourseProgress } from '@/lib/actions/progress';
 import { getQuizForCourse } from '@/lib/actions/quiz';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import LessonViewer from '@/components/lessons/LessonViewer';
-import MarkCompleteButton from '@/components/lessons/MarkCompleteButton';
+import LessonTracker from '@/components/lessons/LessonTracker';
 
 export default async function LessonPage(props: { params: Promise<{ slug: string; lessonId: string }> }) {
   const params = await props.params;
@@ -111,11 +110,13 @@ export default async function LessonPage(props: { params: Promise<{ slug: string
 
           <h1 className="text-3xl font-extrabold text-gray-900 mb-6">{lesson.title}</h1>
           
-          <LessonViewer content={lesson.content} videoUrl={lesson.videoUrl} />
-
-          <div className="mt-8 flex justify-center sm:justify-start">
-            <MarkCompleteButton courseId={course.documentId} lessonId={lesson.documentId} isCompleted={isCompleted} />
-          </div>
+          <LessonTracker
+            courseId={course.documentId}
+            lessonId={lesson.documentId}
+            content={lesson.content}
+            videoUrl={lesson.videoUrl}
+            isCompleted={isCompleted}
+          />
 
           {/* Navigation Footer */}
           <div className="mt-12 pt-8 border-t border-gray-200 flex justify-between items-center">

@@ -9,9 +9,10 @@ type MarkCompleteButtonProps = {
   courseId: string;
   lessonId: string;
   isCompleted: boolean;
+  disabled?: boolean;
 };
 
-export default function MarkCompleteButton({ courseId, lessonId, isCompleted: initialCompleted }: MarkCompleteButtonProps) {
+export default function MarkCompleteButton({ courseId, lessonId, isCompleted: initialCompleted, disabled }: MarkCompleteButtonProps) {
   const [isCompleted, setIsCompleted] = useState(initialCompleted);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function MarkCompleteButton({ courseId, lessonId, isCompleted: in
   return (
     <button 
       onClick={handleComplete}
-      disabled={loading}
+      disabled={loading || disabled}
       className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70 w-full sm:w-auto shadow-sm"
     >
       {loading ? <Loader2 className="animate-spin h-5 w-5" /> : (

@@ -37,8 +37,8 @@ function Sidebar({ role, user, onNavigate }: { role: Role; user: any; onNavigate
   const persona = personas[role];
   const pathname = usePathname();
 
-  const displayName = user?.username || persona.name;
-  const displayEmail = user?.email || persona.email;
+  const displayName = user?.username || "Loading...";
+  const displayEmail = user?.email || "...";
 
   return (
     <div className="flex flex-col h-full">
@@ -118,8 +118,8 @@ export default function AppShell({ role, children }: { role: Role; children: Rea
   const crumbs = crumbsFor(pathname || "");
   const persona = personas[role];
   
-  const displayName = user?.username || persona.name;
-  const displayEmail = user?.email || persona.email;
+  const displayName = user?.username || "Loading...";
+  const displayEmail = user?.email || "...";
 
   return (
     <div data-role={role} className="h-full flex bg-background w-full absolute inset-0 z-50">

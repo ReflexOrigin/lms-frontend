@@ -12,6 +12,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
   const url = endpoint.startsWith('http') ? endpoint : `${STRAPI_URL}${endpoint}`;
 
   const res = await fetch(url, {
+    cache: 'no-store',
     ...options,
     headers: {
       'Content-Type': 'application/json',

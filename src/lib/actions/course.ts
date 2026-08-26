@@ -17,6 +17,7 @@ async function fetchWithAuth(path: string, options: RequestInit = {}) {
   }
 
   const res = await fetch(`${STRAPI_URL}/api${path}`, {
+    cache: 'no-store',
     ...options,
     headers,
   });
@@ -30,14 +31,14 @@ async function fetchWithAuth(path: string, options: RequestInit = {}) {
 }
 
 export async function getCourses(filters = '') {
-  // Populate instructor by default for course cards
-  const res = await fetchWithAuth(`/courses?populate=instructor${filters ? '&' + filters : ''}`);
+  // Populate instructor and lessons by default for course cards
+  const res = await fetchWithAuth(`/courses?populate=instructor,lessons${filters ? '&' + filters : ''}`, { cache: 'no-store' });
   return res.data; // Strapi v5 returns { data: [...] }
 }
 
 export async function getCourse(slug: string) {
   // Populate instructor, lessons
-  const res = await fetchWithAuth(`/courses?filters[slug][$eq]=${slug}&populate=instructor,lessons`);
+  const res = await fetchWithAuth(`/courses?filters[slug][$eq]=${slug}&populate=instructor,lessons`, { cache: 'no-store' });
   return res.data[0];
 }
 

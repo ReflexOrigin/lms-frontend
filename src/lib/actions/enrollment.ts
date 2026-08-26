@@ -30,21 +30,21 @@ async function fetchWithAuth(path: string, options: RequestInit = {}) {
 }
 
 export async function getMyEnrollments() {
-  const res = await fetchWithAuth('/enrollments?populate[course][populate]=lessons');
+  const res = await fetchWithAuth('/enrollments?populate[course][populate][0]=lessons');
   return res.data;
 }
 
-export async function checkEnrollment(courseId: number) {
+export async function checkEnrollment(courseId: string) {
   // Returns true if enrolled, false otherwise
   try {
-    const res = await fetchWithAuth(`/enrollments?filters[course][id][$eq]=${courseId}`);
+    const res = await fetchWithAuth(`/enrollments?filters[course][documentId][$eq]=${courseId}`, { cache: 'no-store' });
     return res.data.length > 0;
   } catch (err) {
     return false;
   }
 }
 
-export async function createEnrollment(courseId: number) {
+export async function createEnrollment(courseId: string) {
   const res = await fetchWithAuth('/enrollments', {
     method: 'POST',
     body: JSON.stringify({ data: { course: courseId } }),

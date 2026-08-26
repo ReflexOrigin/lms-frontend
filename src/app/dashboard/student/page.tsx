@@ -12,7 +12,8 @@ export default async function StudentDashboard() {
   // Fetch enrollments for the student
   let enrolled: any[] = [];
   try {
-    const res = await fetchWithAuth('/api/enrollments?populate=course');
+    // Deep populate course.instructor and course.lessons using Strapi v5 array syntax
+    const res = await fetchWithAuth('/api/enrollments?populate[course][populate][0]=instructor&populate[course][populate][1]=lessons');
     if (res.ok) {
       const data = await res.json();
       enrolled = data.data || [];
@@ -30,8 +31,8 @@ export default async function StudentDashboard() {
         <Card className="overflow-hidden">
           <div className="grid md:grid-cols-2">
             <div className="aspect-[16/10] md:aspect-auto bg-muted relative">
-              <div className="w-full h-full bg-blue-100 flex items-center justify-center">
-                <span className="text-blue-500 font-medium">Course Thumbnail</span>
+              <div className="w-full h-full bg-blue-100 flex items-center justify-center overflow-hidden relative">
+                <img src={`https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=640&q=80`} alt={feature.course?.title} className="w-full h-full object-cover" />
               </div>
             </div>
             <div className="p-6 lg:p-8 flex flex-col justify-center">
@@ -74,16 +75,22 @@ export default async function StudentDashboard() {
       
       {enrolled.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {enrolled.map((m: any) => (
-            <LearningCard
-              key={m.documentId}
-              course={m.course}
-              progress={m.progressPercentage || 0}
-              lessonsCompleted={0}
-              lastLesson={"Next Lesson"}
-              href={`/courses/${m.course?.slug || m.course?.documentId}`}
-            />
-          ))}
+          {enrolled.map((m: any) => {
+            const lessonCount = m.course?.lessons?.length || 0;
+            const progress = m.progressPercentage || 0;
+            const completedCount = Math.round((progress / 100) * lessonCount);
+            
+            return (
+              <LearningCard
+                key={m.documentId}
+                course={m.course}
+                progress={progress}
+                lessonsCompleted={completedCount}
+                lastLesson={"Next Lesson"}
+                href={`/courses/${m.course?.slug || m.course?.documentId}`}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className="text-sm text-gray-500 italic">No courses to display.</div>

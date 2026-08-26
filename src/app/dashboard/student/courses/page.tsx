@@ -9,7 +9,7 @@ import { Button } from "@/components/ui";
 export default async function MyCoursesPage() {
   let enrolled: any[] = [];
   try {
-    const res = await fetchWithAuth('/api/enrollments?populate=course');
+    const res = await fetchWithAuth('/api/enrollments?populate[course][populate][0]=instructor&populate[course][populate][1]=lessons');
     if (res.ok) {
       const data = await res.json();
       enrolled = data.data || [];
@@ -22,16 +22,22 @@ export default async function MyCoursesPage() {
     <Page title="My Courses" subtitle="Continue your learning journey.">
       {enrolled.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {enrolled.map((m: any) => (
-            <LearningCard
-              key={m.documentId}
-              course={m.course}
-              progress={m.progressPercentage || 0}
-              lessonsCompleted={0}
-              lastLesson={"Next Lesson"}
-              href={`/courses/${m.course?.slug || m.course?.documentId}`}
-            />
-          ))}
+          {enrolled.map((m: any) => {
+            const lessonCount = m.course?.lessons?.length || 0;
+            const progress = m.progressPercentage || 0;
+            const completedCount = Math.round((progress / 100) * lessonCount);
+            
+            return (
+              <LearningCard
+                key={m.documentId}
+                course={m.course}
+                progress={progress}
+                lessonsCompleted={completedCount}
+                lastLesson={"Next Lesson"}
+                href={`/courses/${m.course?.slug || m.course?.documentId}`}
+              />
+            );
+          })}
         </div>
       ) : (
         <EmptyState

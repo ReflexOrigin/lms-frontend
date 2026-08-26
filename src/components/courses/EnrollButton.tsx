@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 type EnrollButtonProps = {
-  courseId: number;
+  courseId: string;
   courseSlug: string;
 };
 

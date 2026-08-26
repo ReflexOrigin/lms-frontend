@@ -17,6 +17,7 @@ export function DiscoveryCard({ course, href }: { course: any; href: string }) {
     >
       <div className="aspect-[16/9] bg-muted overflow-hidden">
         <img
+          suppressHydrationWarning
           src={unsplash(course.thumbId || course.documentId, 640, 360)}
           alt={course.title}
           className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
@@ -80,6 +81,7 @@ export function LearningCard({
     <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm flex flex-col">
       <div className="aspect-[16/7] bg-muted overflow-hidden relative">
         <img
+          suppressHydrationWarning
           src={unsplash(course.thumbId || course.documentId, 640, 280)}
           alt={course.title}
           className="w-full h-full object-cover"

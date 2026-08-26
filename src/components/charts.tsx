@@ -84,7 +84,7 @@ export function LineChart({
 }) {
   const w = 640;
   const pad = { t: 16, r: 16, b: 28, l: 40 };
-  const max = Math.max(...data.map((d) => d.value)) * 1.1;
+  const max = Math.max(1, ...data.map((d) => d.value)) * 1.1;
   const iw = w - pad.l - pad.r;
   const ih = height - pad.t - pad.b;
   const x = (i: number) => pad.l + (i / (data.length - 1)) * iw;
@@ -134,7 +134,7 @@ export function BarChart({
   height?: number;
   color?: string;
 }) {
-  const max = Math.max(...data.map((d) => d.value)) || 1;
+  const max = Math.max(1, ...data.map((d) => d.value));
   return (
     <div className="flex items-end gap-3" style={{ height }}>
       {data.map((d, idx) => (

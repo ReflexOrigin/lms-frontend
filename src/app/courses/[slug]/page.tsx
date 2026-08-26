@@ -33,7 +33,7 @@ export default async function CourseDetailPage(props: { params: Promise<{ slug: 
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-4">
               <h1 className="text-3xl font-extrabold text-gray-900">{course.title}</h1>
-              {!course.isPublished && (
+              {!course.publishedAt && (
                 <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full border border-yellow-200">
                   DRAFT
                 </span>
