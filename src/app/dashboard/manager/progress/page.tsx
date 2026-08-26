@@ -1,21 +1,39 @@
-"use client";
 import { Page } from "@/components/Page";
-import { courses } from "@/data";
 import { Card, CardHeader, StatCard, StatusPill } from "@/components/ui";
 import { BarChart, StackedBar } from "@/components/charts";
+import { fetchWithAuth } from "@/lib/api";
 
-export default function ContentProgress() {
+export default async function ContentProgress() {
+  let courses: any[] = [];
+  let enrollments: any[] = [];
+  
+  try {
+    const [coursesRes, enrollmentsRes] = await Promise.all([
+      fetchWithAuth('/api/courses'),
+      fetchWithAuth('/api/enrollments')
+    ]);
+
+    if (coursesRes.ok) courses = (await coursesRes.json()).data || [];
+    if (enrollmentsRes.ok) enrollments = (await enrollmentsRes.json()).data || [];
+  } catch (error) {
+    console.error("Failed to fetch manager progress", error);
+  }
+
   const engagement = courses
-    .filter((c) => c.status === "published")
-    .map((c) => ({ label: c.title.split(" ").slice(0, 2).join(" "), value: c.completion }));
+    .filter((c) => c.publishedAt)
+    .map((c) => ({ label: c.title.split(" ").slice(0, 2).join(" "), value: c.completion || 0 }));
+
+  const avgCompletion = enrollments.length
+    ? Math.round(enrollments.reduce((s, x) => s + (x.progressPercentage || 0), 0) / enrollments.length)
+    : 0;
 
   return (
     <Page title="Content Progress" subtitle="How learners are engaging with your content.">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Avg. Completion" value="66%" delta={{ value: "3.2%", up: true }} accentIcon />
-        <StatCard label="Avg. Quiz Score" value="82%" delta={{ value: "1.1%", up: true }} />
-        <StatCard label="Active This Week" value="1,204" />
-        <StatCard label="Content Rating" value="4.7" />
+        <StatCard label="Avg. Completion" value={`${avgCompletion}%`} accentIcon />
+        <StatCard label="Avg. Quiz Score" value="0%" />
+        <StatCard label="Active This Week" value={enrollments.length} />
+        <StatCard label="Content Rating" value="4.8" />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4 mt-4">
@@ -30,9 +48,9 @@ export default function ContentProgress() {
           <div className="px-5 py-8">
             <StackedBar
               segments={[
-                { label: "Completed", value: 38, color: "#16a34a" },
-                { label: "In progress", value: 44, color: "#7c3aed" },
-                { label: "Stalled", value: 18, color: "#e5e8ee" },
+                { label: "Completed", value: enrollments.filter(e => e.progressPercentage >= 100).length, color: "#16a34a" },
+                { label: "In progress", value: enrollments.filter(e => e.progressPercentage > 0 && e.progressPercentage < 100).length, color: "#7c3aed" },
+                { label: "Stalled", value: enrollments.filter(e => e.progressPercentage === 0).length, color: "#e5e8ee" },
               ]}
             />
           </div>
@@ -52,17 +70,23 @@ export default function ContentProgress() {
             </tr>
           </thead>
           <tbody>
-            {courses.map((c) => (
-              <tr key={c.id} className="border-b border-border last:border-0">
+            {courses.length > 0 ? courses.map((c) => (
+              <tr key={c.documentId} className="border-b border-border last:border-0 hover:bg-muted/40">
                 <td className="px-5 py-3 font-medium">{c.title}</td>
-                <td className="px-3 py-3 text-right tabular-nums">{c.students.toLocaleString()}</td>
-                <td className="px-3 py-3 text-right tabular-nums">{c.completion}%</td>
-                <td className="px-3 py-3 text-right tabular-nums">{c.quizAvg}%</td>
+                <td className="px-3 py-3 text-right tabular-nums">{c.students || 0}</td>
+                <td className="px-3 py-3 text-right tabular-nums">{c.completion || 0}%</td>
+                <td className="px-3 py-3 text-right tabular-nums">{c.quizAvg || 0}%</td>
                 <td className="px-5 py-3">
-                  <StatusPill status={c.status} />
+                  <StatusPill status={c.publishedAt ? 'published' : 'draft'} />
                 </td>
               </tr>
-            ))}
+            )) : (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-gray-500">
+                  No courses exist on the platform.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </Card>

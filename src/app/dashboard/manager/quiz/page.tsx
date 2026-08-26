@@ -2,15 +2,28 @@
 import { useState } from "react";
 import { Copy, GripVertical, Plus, Trash2 } from "lucide-react";
 import { Page } from "@/components/Page";
-import { quizzes, type QuizQuestion } from "@/data";
 import { Button, Card, CardHeader, Field, Input, cx, useToast } from "@/components/ui";
+
+export type QuizQuestion = {
+  id: string;
+  prompt: string;
+  options: string[];
+  correct: number;
+};
 
 let uid = 100;
 
 export default function QuizBuilder() {
   const toast = useToast();
-  const [title, setTitle] = useState(quizzes[0].title);
-  const [questions, setQuestions] = useState<QuizQuestion[]>(quizzes[0].questions);
+  const [title, setTitle] = useState("Final Assessment");
+  const [questions, setQuestions] = useState<QuizQuestion[]>([
+    {
+      id: "q-initial",
+      prompt: "What is the primary goal of cross-validation?",
+      options: ["To evaluate model performance", "To speed up training", "To reduce dataset size", "To increase bias"],
+      correct: 0
+    }
+  ]);
   const [active, setActive] = useState(questions[0].id);
 
   const current = questions.find((q) => q.id === active) ?? questions[0];
