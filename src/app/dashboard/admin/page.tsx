@@ -1,25 +1,9 @@
-"use client";
-import {
-  BookOpen,
-  FileText,
-  GraduationCap,
-  Newspaper,
-  ShieldCheck,
-  UserCog,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { BookOpen, FileText, GraduationCap, Newspaper, ShieldCheck, UserCog, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
 import { Page } from "@/components/Page";
-import {
-  courses,
-  enrollmentTrend,
-  platformActivity,
-  platformStats,
-  userDistribution,
-} from "@/data";
 import { Avatar, Badge, Button, Card, CardHeader, StatCard, StatusPill } from "@/components/ui";
 import { DonutChart, LineChart } from "@/components/charts";
+import { fetchWithAuth } from "@/lib/api";
 
 const activityIcon: Record<string, typeof Users> = {
   user: UserPlus,
@@ -29,19 +13,69 @@ const activityIcon: Record<string, typeof Users> = {
   quiz: FileText,
 };
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  let courses: any[] = [];
+  let users: any[] = [];
+  let enrollments: any[] = [];
+  let blogs: any[] = [];
+  
+  try {
+    const [coursesRes, usersRes, enrollmentsRes, blogsRes] = await Promise.all([
+      fetchWithAuth('/api/courses?populate=instructor,lessons'),
+      fetchWithAuth('/api/users?populate=role'),
+      fetchWithAuth('/api/enrollments'),
+      fetchWithAuth('/api/blogs').catch(() => ({ ok: false, json: () => ({ data: [] }) }))
+    ]);
+
+    if (coursesRes.ok) courses = (await coursesRes.json()).data || [];
+    if (usersRes.ok) users = await usersRes.json();
+    if (enrollmentsRes.ok) enrollments = (await enrollmentsRes.json()).data || [];
+    if (blogsRes.ok) blogs = (await blogsRes.json()).data || [];
+  } catch (error) {
+    console.error("Failed to fetch admin data", error);
+  }
+
+  const publishedCourses = courses.filter((c) => c.publishedAt).length;
+
+  const roleCounts = {
+    students: users.filter(u => u.role?.name?.toLowerCase() === 'student' || u.role?.name?.toLowerCase() === 'authenticated').length,
+    instructors: users.filter(u => u.role?.name?.toLowerCase() === 'instructor').length,
+    contentManagers: users.filter(u => u.role?.name?.toLowerCase() === 'manager' || u.role?.name?.toLowerCase() === 'content manager').length,
+    admins: users.filter(u => u.role?.name?.toLowerCase() === 'admin' || u.role?.name?.toLowerCase() === 'administrator').length,
+  };
+
+  const userDistribution = [
+    { label: "Students", value: roleCounts.students, color: "#2563eb" },
+    { label: "Instructors", value: roleCounts.instructors, color: "#0d9488" },
+    { label: "Managers", value: roleCounts.contentManagers, color: "#7c3aed" },
+    { label: "Admins", value: roleCounts.admins, color: "#4f46e5" },
+  ].filter(d => d.value > 0);
+  
+  // Dummy data for charts since we don't have historical timeseries data in Strapi yet
+  const enrollmentTrend = [
+    { label: "Jan", value: 120 }, { label: "Feb", value: 150 },
+    { label: "Mar", value: 180 }, { label: "Apr", value: 220 },
+    { label: "May", value: 270 }, { label: "Jun", value: 310 },
+    { label: "Jul", value: 380 }, { label: "Aug", value: 450 },
+  ];
+
+  const recentActivity = [
+    { id: '1', kind: 'user', text: `${users[users.length-1]?.username || 'A new user'} joined the platform.`, time: 'Recently' },
+    { id: '2', kind: 'course', text: `${courses[courses.length-1]?.title || 'A new course'} was updated.`, time: 'Recently' }
+  ];
+
   return (
     <Page
       title="Platform Overview"
       subtitle="Full visibility across users, content, and activity."
       actions={
         <>
-          <Link href="/admin/users">
+          <Link href="/dashboard/admin/users">
             <Button variant="outline">
               <UserCog size={16} /> Manage users
             </Button>
           </Link>
-          <Link href="/admin/analytics">
+          <Link href="/dashboard/admin/analytics">
             <Button>
               <ShieldCheck size={16} /> Platform analytics
             </Button>
@@ -51,20 +85,20 @@ export default function AdminDashboard() {
     >
       {/* Primary KPIs — platform health first */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Users" value={platformStats.totalUsers.toLocaleString()} delta={{ value: "6.2% this month", up: true }} icon={<Users size={16} />} accentIcon />
-        <StatCard label="Total Courses" value={platformStats.totalCourses} delta={{ value: `${platformStats.publishedCourses} published`, up: true }} icon={<BookOpen size={16} />} />
-        <StatCard label="Total Enrollments" value={platformStats.totalEnrollments.toLocaleString()} delta={{ value: "12.4% this month", up: true }} icon={<GraduationCap size={16} />} />
-        <StatCard label="Active Learners" value={platformStats.activeLearners.toLocaleString()} delta={{ value: "1.1% vs last wk", up: false }} icon={<Users size={16} />} />
+        <StatCard label="Total Users" value={users.length.toLocaleString()} delta={{ value: "Live Data", up: true }} icon={<Users size={16} />} accentIcon />
+        <StatCard label="Total Courses" value={courses.length} delta={{ value: `${publishedCourses} published`, up: true }} icon={<BookOpen size={16} />} />
+        <StatCard label="Total Enrollments" value={enrollments.length.toLocaleString()} delta={{ value: "Live Data", up: true }} icon={<GraduationCap size={16} />} />
+        <StatCard label="Active Learners" value={roleCounts.students.toLocaleString()} delta={{ value: "Live Data", up: true }} icon={<Users size={16} />} />
       </div>
 
       {/* Role breakdown strip */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4">
         {[
-          { l: "Students", v: platformStats.students, c: "#2563eb" },
-          { l: "Instructors", v: platformStats.instructors, c: "#0d9488" },
-          { l: "Content Managers", v: platformStats.contentManagers, c: "#7c3aed" },
-          { l: "Administrators", v: platformStats.admins, c: "#4f46e5" },
-          { l: "Blog Posts", v: platformStats.totalBlogPosts, c: "#d97706" },
+          { l: "Students", v: roleCounts.students, c: "#2563eb" },
+          { l: "Instructors", v: roleCounts.instructors, c: "#0d9488" },
+          { l: "Content Managers", v: roleCounts.contentManagers, c: "#7c3aed" },
+          { l: "Administrators", v: roleCounts.admins, c: "#4f46e5" },
+          { l: "Blog Posts", v: blogs.length, c: "#d97706" },
         ].map((s) => (
           <Card key={s.l} className="px-4 py-3">
             <div className="flex items-center gap-2">
@@ -79,7 +113,7 @@ export default function AdminDashboard() {
       {/* Charts */}
       <div className="grid lg:grid-cols-5 gap-4 mt-4">
         <Card className="lg:col-span-3">
-          <CardHeader title="Enrollment Trend" subtitle="Monthly enrollments, last 8 months" action={<Badge tone="success">▲ 177%</Badge>} />
+          <CardHeader title="Enrollment Trend" subtitle="Monthly enrollments (Sample Data)" />
           <div className="px-3 pb-4 pt-2">
             <LineChart data={enrollmentTrend} />
           </div>
@@ -99,7 +133,7 @@ export default function AdminDashboard() {
             title="Course Activity"
             subtitle="Top courses across all instructors"
             action={
-              <Link href="/admin/courses">
+              <Link href="/dashboard/admin/courses">
                 <Button variant="ghost" size="sm">
                   View all
                 </Button>
@@ -112,30 +146,35 @@ export default function AdminDashboard() {
                 <tr className="text-left text-xs text-muted-foreground border-y border-border">
                   <th className="font-medium px-5 py-2.5">Course</th>
                   <th className="font-medium px-3 py-2.5">Instructor</th>
-                  <th className="font-medium px-3 py-2.5 text-right">Enrollments</th>
+                  <th className="font-medium px-3 py-2.5 text-right">Students</th>
                   <th className="font-medium px-3 py-2.5">Completion</th>
                   <th className="font-medium px-5 py-2.5">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {courses.slice(0, 5).map((c) => (
-                  <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted/50">
-                    <td className="px-5 py-3 font-medium">{c.title}</td>
-                    <td className="px-3 py-3 text-muted-foreground">{c.instructor}</td>
-                    <td className="px-3 py-3 text-right tabular-nums">{c.students.toLocaleString()}</td>
-                    <td className="px-3 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                          <div className="h-full accent-bg rounded-full" style={{ width: `${c.completion}%` }} />
+                {courses.length > 0 ? courses.slice(0, 5).map((c) => {
+                  const completion = c.completion || 0;
+                  return (
+                    <tr key={c.documentId} className="border-b border-border last:border-0 hover:bg-muted/50">
+                      <td className="px-5 py-3 font-medium">{c.title}</td>
+                      <td className="px-3 py-3 text-muted-foreground">{c.instructor?.username || 'System'}</td>
+                      <td className="px-3 py-3 text-right tabular-nums">{c.students || 0}</td>
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                            <div className="h-full accent-bg rounded-full" style={{ width: `${completion}%` }} />
+                          </div>
+                          <span className="text-xs tabular-nums text-muted-foreground">{completion}%</span>
                         </div>
-                        <span className="text-xs tabular-nums text-muted-foreground">{c.completion}%</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      <StatusPill status={c.status} />
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-5 py-3">
+                        <StatusPill status={c.publishedAt ? 'published' : 'draft'} />
+                      </td>
+                    </tr>
+                  )
+                }) : (
+                  <tr><td colSpan={5} className="p-8 text-center text-gray-500">No courses available.</td></tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -144,7 +183,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader title="Recent Platform Activity" />
           <ul className="px-5 py-4 space-y-4">
-            {platformActivity.map((a) => {
+            {recentActivity.map((a) => {
               const Icon = activityIcon[a.kind] ?? Users;
               return (
                 <li key={a.id} className="flex gap-3">

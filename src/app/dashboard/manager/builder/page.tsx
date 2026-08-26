@@ -13,13 +13,18 @@ import {
   FileText,
 } from "lucide-react";
 import { Page } from "@/components/Page";
-import { courses } from "@/data";
 import { Button, Card, CardHeader, Field, Input, Select, Textarea, useToast } from "@/components/ui";
+
+const baseCourse = {
+  lessons: [
+    { id: "1", order: 1, title: "Welcome to the Course", summary: "Introduction", duration: "5 min", status: "published", type: "video" },
+    { id: "2", order: 2, title: "Getting Started", summary: "Setup instructions", duration: "10 min", status: "published", type: "reading" }
+  ]
+};
 
 export default function CourseBuilder() {
   const toast = useToast();
-  const base = courses[0];
-  const [lessons, setLessons] = useState(base.lessons);
+  const [lessons, setLessons] = useState(baseCourse.lessons);
 
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir;

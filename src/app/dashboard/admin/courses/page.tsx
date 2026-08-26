@@ -1,25 +1,41 @@
-"use client";
-import { useState } from "react";
 import Link from "next/link";
 import { Eye, Filter, Pencil, Search, Trash2 } from "lucide-react";
 import { Page, NewButton } from "@/components/Page";
-import { courses } from "@/data";
-import { Button, Card, Input, Select, StatusPill } from "@/components/ui";
+import { Button, Card, StatusPill } from "@/components/ui";
+import { fetchWithAuth } from "@/lib/api";
 
-export default function AdminCourses() {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all");
-  const [instructor, setInstructor] = useState("all");
-  const [category, setCategory] = useState("all");
+export default async function AdminCourses({ searchParams }: { searchParams: any }) {
+  const query = searchParams?.q?.toLowerCase() || "";
+  const statusFilter = searchParams?.status || "all";
+  const instructorFilter = searchParams?.instructor || "all";
+  const categoryFilter = searchParams?.category || "all";
 
-  const instructors = Array.from(new Set(courses.map((c) => c.instructor)));
-  const cats = Array.from(new Set(courses.map((c) => c.category)));
+  let courses: any[] = [];
+  try {
+    const res = await fetchWithAuth('/api/courses?populate=instructor,lessons,category');
+    if (res.ok) {
+      courses = (await res.json()).data || [];
+    }
+  } catch (error) {
+    console.error("Failed to fetch admin courses", error);
+  }
+
+  const instructors = Array.from(new Set(courses.map((c) => c.instructor?.username).filter(Boolean)));
+  const cats = Array.from(new Set(courses.map((c) => c.category?.name).filter(Boolean)));
 
   let list = courses;
-  if (status !== "all") list = list.filter((c) => c.status === status);
-  if (instructor !== "all") list = list.filter((c) => c.instructor === instructor);
-  if (category !== "all") list = list.filter((c) => c.category === category);
-  if (query) list = list.filter((c) => c.title.toLowerCase().includes(query.toLowerCase()));
+  if (statusFilter !== "all") {
+    list = list.filter((c) => statusFilter === "published" ? c.publishedAt : !c.publishedAt);
+  }
+  if (instructorFilter !== "all") {
+    list = list.filter((c) => c.instructor?.username === instructorFilter);
+  }
+  if (categoryFilter !== "all") {
+    list = list.filter((c) => c.category?.name === categoryFilter);
+  }
+  if (query) {
+    list = list.filter((c) => c.title.toLowerCase().includes(query));
+  }
 
   return (
     <Page
@@ -28,30 +44,36 @@ export default function AdminCourses() {
       actions={<NewButton label="Create course" />}
     >
       <Card className="overflow-hidden">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 border-b border-border">
+        <form className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 border-b border-border">
           <div className="relative sm:col-span-2 lg:col-span-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search courses" className="pl-9" value={query} onChange={(e) => setQuery(e.target.value)} />
+            <input 
+              name="q"
+              defaultValue={query}
+              placeholder="Search courses" 
+              className="w-full h-9 pl-9 pr-3 rounded-lg border border-border bg-transparent text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all" 
+            />
           </div>
-          <Select value={status} onChange={(e) => setStatus(e.target.value)}>
+          <select name="status" defaultValue={statusFilter} onChange={(e) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-border bg-card text-sm outline-none">
             <option value="all">All statuses</option>
             <option value="published">Published</option>
             <option value="draft">Draft</option>
             <option value="archived">Archived</option>
-          </Select>
-          <Select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
+          </select>
+          <select name="instructor" defaultValue={instructorFilter} onChange={(e) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-border bg-card text-sm outline-none">
             <option value="all">All instructors</option>
-            {instructors.map((i) => (
-              <option key={i}>{i}</option>
+            {instructors.map((i: any) => (
+              <option key={i} value={i}>{i}</option>
             ))}
-          </Select>
-          <Select value={category} onChange={(e) => setCategory(e.target.value)}>
+          </select>
+          <select name="category" defaultValue={categoryFilter} onChange={(e) => e.target.form?.submit()} className="h-9 px-3 rounded-lg border border-border bg-card text-sm outline-none">
             <option value="all">All categories</option>
-            {cats.map((c) => (
-              <option key={c}>{c}</option>
+            {cats.map((c: any) => (
+              <option key={c} value={c}>{c}</option>
             ))}
-          </Select>
-        </div>
+          </select>
+          <noscript><button type="submit" className="hidden">Filter</button></noscript>
+        </form>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[860px]">
@@ -68,44 +90,47 @@ export default function AdminCourses() {
               </tr>
             </thead>
             <tbody>
-              {list.map((c) => (
-                <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted/40">
-                  <td className="px-5 py-3">
-                    <Link href={`/admin/courses/${c.slug}`} className="font-medium hover:accent-text">
-                      {c.title}
-                    </Link>
-                    <div className="text-xs text-muted-foreground">{c.category}</div>
-                  </td>
-                  <td className="px-3 py-3 text-muted-foreground">{c.instructor}</td>
-                  <td className="px-3 py-3 text-right tabular-nums">{c.lessons.length}</td>
-                  <td className="px-3 py-3 text-right tabular-nums">{c.students.toLocaleString()}</td>
-                  <td className="px-3 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-14 h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div className="h-full accent-bg rounded-full" style={{ width: `${c.completion}%` }} />
-                      </div>
-                      <span className="text-xs text-muted-foreground tabular-nums">{c.completion}%</span>
-                    </div>
-                  </td>
-                  <td className="px-3 py-3">
-                    <StatusPill status={c.status} />
-                  </td>
-                  <td className="px-3 py-3 text-muted-foreground">{c.updated}</td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center justify-end gap-1 text-muted-foreground">
-                      <Link href={`/admin/courses/${c.slug}`} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center">
-                        <Eye size={16} />
+              {list.map((c) => {
+                const completion = c.completion || 0;
+                return (
+                  <tr key={c.documentId} className="border-b border-border last:border-0 hover:bg-muted/40">
+                    <td className="px-5 py-3">
+                      <Link href={`/dashboard/admin/courses/${c.documentId}`} className="font-medium hover:accent-text">
+                        {c.title}
                       </Link>
-                      <button className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center">
-                        <Pencil size={16} />
-                      </button>
-                      <button className="w-8 h-8 rounded-lg hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] flex items-center justify-center">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      <div className="text-xs text-muted-foreground">{c.category?.name || 'Uncategorized'}</div>
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">{c.instructor?.username || 'System'}</td>
+                    <td className="px-3 py-3 text-right tabular-nums">{c.lessons?.length || 0}</td>
+                    <td className="px-3 py-3 text-right tabular-nums">{c.students || 0}</td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-14 h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full accent-bg rounded-full" style={{ width: `${completion}%` }} />
+                        </div>
+                        <span className="text-xs text-muted-foreground tabular-nums">{completion}%</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <StatusPill status={c.publishedAt ? 'published' : 'draft'} />
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">{new Date(c.updatedAt).toLocaleDateString()}</td>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center justify-end gap-1 text-muted-foreground">
+                        <Link href={`/dashboard/admin/courses/${c.documentId}`} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center">
+                          <Eye size={16} />
+                        </Link>
+                        <button className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center">
+                          <Pencil size={16} />
+                        </button>
+                        <button className="w-8 h-8 rounded-lg hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] flex items-center justify-center">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

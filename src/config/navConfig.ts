@@ -32,65 +32,65 @@ export interface NavSection {
 // relabeled copy of the same sidebar.
 export const navConfig: Record<Role, { home: string; sections: NavSection[] }> = {
   admin: {
-    home: "/admin",
+    home: "/dashboard/admin",
     sections: [
       {
         items: [
-          { label: "Dashboard", to: "/admin", icon: LayoutDashboard },
-          { label: "Users", to: "/admin/users", icon: Users },
-          { label: "Courses", to: "/admin/courses", icon: BookOpen },
-          { label: "Blog", to: "/admin/blog", icon: Newspaper },
+          { label: "Dashboard", to: "/dashboard/admin", icon: LayoutDashboard },
+          { label: "Users", to: "/dashboard/admin/users", icon: Users },
+          { label: "Courses", to: "/dashboard/admin/courses", icon: BookOpen },
+          { label: "Blog", to: "/dashboard/admin/blog", icon: Newspaper },
         ],
       },
       {
         heading: "Platform",
         items: [
-          { label: "Analytics", to: "/admin/analytics", icon: BarChart3 },
-          { label: "Access & Roles", to: "/admin/users", icon: ShieldCheck },
-          { label: "Settings", to: "/admin/analytics", icon: Settings },
+          { label: "Analytics", to: "/dashboard/admin/analytics", icon: BarChart3 },
+          { label: "Access & Roles", to: "/dashboard/admin/users", icon: ShieldCheck },
+          { label: "Settings", to: "/dashboard/admin/analytics", icon: Settings },
         ],
       },
     ],
   },
   manager: {
-    home: "/manager",
+    home: "/dashboard/manager",
     sections: [
       {
         items: [
-          { label: "Dashboard", to: "/manager", icon: LayoutDashboard },
-          { label: "Course Library", to: "/manager/courses", icon: LibraryBig },
+          { label: "Dashboard", to: "/dashboard/manager", icon: LayoutDashboard },
+          { label: "Course Library", to: "/dashboard/manager/courses", icon: LibraryBig },
         ],
       },
       {
         heading: "Authoring",
         items: [
-          { label: "Course Builder", to: "/manager/builder", icon: PenSquare },
-          { label: "Lesson Editor", to: "/manager/lesson", icon: FileText },
-          { label: "Quiz Builder", to: "/manager/quiz", icon: ListChecks },
-          { label: "Blog Editor", to: "/manager/blog", icon: Newspaper },
+          { label: "Course Builder", to: "/dashboard/manager/builder", icon: PenSquare },
+          { label: "Lesson Editor", to: "/dashboard/manager/lesson", icon: FileText },
+          { label: "Quiz Builder", to: "/dashboard/manager/quiz", icon: ListChecks },
+          { label: "Blog Editor", to: "/dashboard/manager/blog", icon: Newspaper },
         ],
       },
       {
         heading: "Insight",
-        items: [{ label: "Content Progress", to: "/manager/progress", icon: TrendingUp }],
+        items: [{ label: "Content Progress", to: "/dashboard/manager/progress", icon: TrendingUp }],
       },
     ],
   },
   instructor: {
-    home: "/instructor",
+    home: "/dashboard/instructor",
     sections: [
       {
         items: [
-          { label: "Dashboard", to: "/instructor", icon: LayoutDashboard },
-          { label: "My Courses", to: "/instructor/courses", icon: BookOpen },
+          { label: "Dashboard", to: "/dashboard/instructor", icon: LayoutDashboard },
+          { label: "My Courses", to: "/dashboard/instructor/courses", icon: BookOpen },
         ],
       },
       {
         heading: "Teaching",
         items: [
-          { label: "Lessons", to: "/instructor/lessons", icon: FileText },
-          { label: "Quizzes", to: "/instructor/quizzes", icon: ListChecks },
-          { label: "Student Progress", to: "/instructor/progress", icon: TrendingUp },
+          { label: "Lessons", to: "/dashboard/instructor/lessons", icon: FileText },
+          { label: "Quizzes", to: "/dashboard/instructor/quizzes", icon: ListChecks },
+          { label: "Student Progress", to: "/dashboard/instructor/progress", icon: TrendingUp },
         ],
       },
     ],
