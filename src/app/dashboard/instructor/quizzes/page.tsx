@@ -1,22 +1,19 @@
-"use client";
 import { ListChecks, Pencil, Plus } from "lucide-react";
 import { Page } from "@/components/Page";
 import { Button, Card, StatusPill } from "@/components/ui";
-import { myCourses } from "../page";
+import { fetchWithAuth } from "@/lib/api";
 
-const quizzesByCourse = myCourses.flatMap((c, ci) =>
-  ["Module 1 Checkpoint", "Module 3 Assessment", ci === 0 ? "Final Exam" : "Practice Set"].map((title, i) => ({
-    id: `${c.id}-q${i}`,
-    title,
-    course: c.title,
-    questions: 5 + i * 3,
-    attempts: 40 + i * 25 + ci * 10,
-    avg: 68 + i * 6,
-    status: i === 2 ? "draft" : "published",
-  })),
-);
+export default async function InstructorQuizzes() {
+  let quizzes: any[] = [];
+  try {
+    const res = await fetchWithAuth('/api/quizzes?populate=course');
+    if (res.ok) {
+      quizzes = (await res.json()).data || [];
+    }
+  } catch (error) {
+    console.error("Failed to fetch instructor quizzes", error);
+  }
 
-export default function InstructorQuizzes() {
   return (
     <Page
       title="Quiz Management"
@@ -34,27 +31,23 @@ export default function InstructorQuizzes() {
               <th className="font-medium px-5 py-3">Quiz</th>
               <th className="font-medium px-3 py-3">Course</th>
               <th className="font-medium px-3 py-3 text-right">Questions</th>
-              <th className="font-medium px-3 py-3 text-right">Attempts</th>
-              <th className="font-medium px-3 py-3 text-right">Avg. Score</th>
               <th className="font-medium px-3 py-3">Status</th>
               <th className="font-medium px-5 py-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {quizzesByCourse.map((q) => (
-              <tr key={q.id} className="border-b border-border last:border-0 hover:bg-muted/40">
+            {quizzes.length > 0 ? quizzes.map((q) => (
+              <tr key={q.documentId} className="border-b border-border last:border-0 hover:bg-muted/40">
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2.5">
                     <ListChecks size={16} className="text-muted-foreground" />
                     <span className="font-medium">{q.title}</span>
                   </div>
                 </td>
-                <td className="px-3 py-3 text-muted-foreground">{q.course}</td>
-                <td className="px-3 py-3 text-right tabular-nums">{q.questions}</td>
-                <td className="px-3 py-3 text-right tabular-nums">{q.attempts}</td>
-                <td className="px-3 py-3 text-right tabular-nums">{q.avg}%</td>
+                <td className="px-3 py-3 text-muted-foreground">{q.course?.title || 'General'}</td>
+                <td className="px-3 py-3 text-right tabular-nums">{q.questions?.length || 0}</td>
                 <td className="px-3 py-3">
-                  <StatusPill status={q.status} />
+                  <StatusPill status={q.publishedAt ? 'published' : 'draft'} />
                 </td>
                 <td className="px-5 py-3 text-right">
                   <button className="w-8 h-8 rounded-lg hover:bg-muted inline-flex items-center justify-center text-muted-foreground">
@@ -62,7 +55,13 @@ export default function InstructorQuizzes() {
                   </button>
                 </td>
               </tr>
-            ))}
+            )) : (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-gray-500">
+                  You haven't created any quizzes yet.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </Card>
