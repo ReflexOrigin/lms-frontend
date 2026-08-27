@@ -23,7 +23,11 @@ export default async function LessonPage(props: { params: Promise<{ slug: string
     getQuizForCourse(course.documentId).catch(() => null)
   ]);
   
-  const completedLessonIds = new Set(progresses.map((p: any) => p.lesson?.documentId));
+  const completedLessonIds = new Set(
+    progresses
+      .filter((p: any) => p.completed)
+      .map((p: any) => p.lesson?.documentId)
+  );
   const isCompleted = completedLessonIds.has(lesson.documentId);
 
   const allLessons = [...(course.lessons || [])].sort((a: any, b: any) => a.order - b.order);
