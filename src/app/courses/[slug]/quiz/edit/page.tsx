@@ -26,7 +26,7 @@ export default function EditQuizPage(props: { params: Promise<{ slug: string }> 
 
     const fetchData = async () => {
       try {
-        const cData = await getCourse(slug);
+        const cData = await getCourse(slug, true);
         if (!cData) throw new Error('Course not found');
         setCourse(cData);
         

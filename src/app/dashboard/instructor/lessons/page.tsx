@@ -2,16 +2,13 @@ import Link from "next/link";
 import { FileText, Pencil, PlayCircle, Plus, Video } from "lucide-react";
 import { Page } from "@/components/Page";
 import { Button, Card, StatusPill } from "@/components/ui";
-import { fetchWithAuth } from "@/lib/api";
+import { getCourses } from "@/lib/services/courseService";
 
 export default async function InstructorLessons() {
   let myCourses: any[] = [];
   try {
-    // Fetch courses and populate their lessons
-    const res = await fetchWithAuth('/api/courses?populate=lessons');
-    if (res.ok) {
-      myCourses = (await res.json()).data || [];
-    }
+    // Fetch courses and populate their lessons. getCourses handles the instructorView flag.
+    myCourses = await getCourses('instructorView=true');
   } catch (error) {
     console.error("Failed to fetch instructor lessons", error);
   }

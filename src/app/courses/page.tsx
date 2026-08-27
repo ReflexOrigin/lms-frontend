@@ -20,13 +20,13 @@ export default async function CoursesPage() {
             <div key={course.documentId} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all border border-gray-100 flex flex-col">
               <div className="h-48 bg-blue-50 relative">
                 {course.thumbnail ? (
-                  <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
+                  <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" suppressHydrationWarning />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-blue-300 font-bold text-xl">
                     No Image
                   </div>
                 )}
-                {course.isPublished ? (
+                {course.publishedAt ? (
                   <span className="absolute top-4 right-4 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-green-200">Published</span>
                 ) : (
                   <span className="absolute top-4 right-4 bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-gray-200">Draft</span>
@@ -42,10 +42,10 @@ export default async function CoursesPage() {
                   <span className="text-sm font-medium text-gray-500">
                     By {course.instructor?.username || 'Unknown'}
                   </span>
-                  <Link 
-                    href={`/courses/${course.slug}`}
-                    className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
-                  >
+                    <Link 
+                      href={`/courses/${course.slug || course.documentId}`} 
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                    >
                     View Details →
                   </Link>
                 </div>

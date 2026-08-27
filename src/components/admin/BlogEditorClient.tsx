@@ -32,7 +32,7 @@ export default function BlogEditorClient({
 
   const handleSave = async (publish: boolean = false) => {
     if (!title.trim() || !body.trim()) {
-      toast("Title and body are required", "error");
+      toast("Title and body are required", "danger");
       return;
     }
 
@@ -67,7 +67,7 @@ export default function BlogEditorClient({
       router.refresh();
       
     } catch (error: any) {
-      toast(error.message || "Failed to save post", "error");
+      toast(error.message || "Failed to save post", "danger");
     } finally {
       setIsSaving(false);
     }
@@ -135,7 +135,7 @@ export default function BlogEditorClient({
                 <Avatar name={authorName || "Author"} size={28} /> {authorName || "Author"} · {new Date().toLocaleDateString()}
               </div>
               <div className="mt-5 space-y-4 text-[15px] leading-relaxed text-foreground/90">
-                {body ? body.split("\n\n").map((p, i) => (
+                {body ? body.split("\n\n").map((p: string, i: number) => (
                   <p key={i}>{p}</p>
                 )) : <p className="text-muted-foreground italic">Your content will appear here...</p>}
               </div>

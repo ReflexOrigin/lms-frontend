@@ -7,7 +7,7 @@ import { getCurrentUser } from "@/lib/services/userService";
 
 export default async function InstructorDashboard() {
   const user = await getCurrentUser();
-  const myCourses = await getCourses(); // Backend auto-filters by instructor
+  const myCourses = await getCourses('instructorView=true'); // Backend auto-filters by instructor
 
   const totalStudents = myCourses.reduce((s, c) => s + (c.students || 0), 0);
   const avgCompletion = myCourses.length 
@@ -86,7 +86,7 @@ export default async function InstructorDashboard() {
                     <div className="text-[11px] text-muted-foreground">Quiz avg</div>
                   </div>
                 </div>
-                <Link href={`/dashboard/instructor/courses/${c.slug || c.documentId}`} className="mt-4">
+                <Link href={`/courses/${c.slug || c.documentId}/edit`} className="mt-4">
                   <Button variant="outline" className="w-full">
                     View course
                   </Button>

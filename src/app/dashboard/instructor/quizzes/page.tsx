@@ -6,7 +6,7 @@ import { fetchWithAuth } from "@/lib/api";
 export default async function InstructorQuizzes() {
   let quizzes: any[] = [];
   try {
-    const res = await fetchWithAuth('/api/quizzes?populate=course');
+    const res = await fetchWithAuth('/api/quizzes?populate[0]=course&instructorView=true');
     if (res.ok) {
       quizzes = (await res.json()).data || [];
     }

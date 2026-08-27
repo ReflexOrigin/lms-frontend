@@ -25,7 +25,7 @@ export default function EditCoursePage(props: { params: Promise<{ slug: string }
 
     const fetchCourse = async () => {
       try {
-        const data = await getCourse(slug);
+        const data = await getCourse(slug, true);
         if (!data) {
           throw new Error('Course not found');
         }

@@ -27,22 +27,25 @@ export interface StrapiCourse {
 export async function getCourses(filters = ''): Promise<StrapiCourse[]> {
   try {
     // Populate instructor to get their name, and lessons to get lesson count
-    const query = filters ? `?populate=instructor,lessons&${filters}` : '?populate=instructor,lessons';
+    const query = filters ? `?populate[0]=instructor&populate[1]=lessons&${filters}` : '?populate[0]=instructor&populate[1]=lessons';
+    
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    console.log(`[getCourses] JWT Cookie present: ${!!cookieStore.get('jwt')?.value}`);
+
     const res = await fetchWithAuth(`/api/courses${query}`, { cache: 'no-store' });
     
     if (!res.ok) {
-      console.error(`Course fetch failed with status ${res.status}`);
+      const errText = await res.text();
+      console.error(`Course fetch failed with status ${res.status}. Body: ${errText}`);
       return [];
     }
     
     const data = await res.json();
-    
-    // Map Strapi's flat response back to our expected shape if needed
-    // Assuming Strapi v5 returns data array without nesting attributes
     return data.data || [];
   } catch (error) {
     console.error('Course fetch error:', error);
-    return []; // Return empty array if backend is down or empty
+    return [];
   }
 }
 

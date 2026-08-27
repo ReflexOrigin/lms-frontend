@@ -25,7 +25,7 @@ export default function BlogClient({ initialPosts }: { initialPosts: any[] }) {
         setPosts((ps) => ps.map((x) => x.documentId === p.documentId ? { ...x, publishedAt: new Date().toISOString() } : x));
       }
     } catch (e: any) {
-      toast(e.message || "Action failed", "error");
+      toast(e.message || "Action failed", "danger");
     } finally {
       setLoadingId(null);
     }
@@ -39,7 +39,7 @@ export default function BlogClient({ initialPosts }: { initialPosts: any[] }) {
       toast("Post deleted successfully");
       setPosts((ps) => ps.filter((x) => x.documentId !== id));
     } catch (e: any) {
-      toast(e.message || "Delete failed", "error");
+      toast(e.message || "Delete failed", "danger");
     } finally {
       setLoadingId(null);
     }

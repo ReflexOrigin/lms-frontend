@@ -13,31 +13,37 @@ export default function CourseForm({ initialData, onSubmit }: CourseFormProps) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [thumbnail, setThumbnail] = useState(initialData?.thumbnail || '');
-  const [isPublished, setIsPublished] = useState(initialData?.isPublished || false);
+  const [isPublished, setIsPublished] = useState(initialData ? !!initialData.publishedAt : false);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
-      const data = {
+      const data: any = {
         title,
         description,
         thumbnail,
-        isPublished,
+        publishedAt: isPublished ? new Date().toISOString() : null,
       };
 
       const result = await onSubmit(data);
-      // Result should have slug so we can redirect
-      if (result?.slug) {
-        router.push(`/courses/${result.slug}`);
-      } else {
-        router.push('/courses');
+      setSuccess('Course saved successfully!');
+      router.refresh(); // Invalidate Next.js cache so any server components refresh
+
+      const targetId = result?.slug || result?.documentId;
+      if (targetId && !initialData) {
+        // Only redirect if we are creating a new course
+        router.push(`/courses/${targetId}/edit`);
+      } else if (!targetId && !initialData) {
+        router.push('/dashboard');
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred while saving the course.');
@@ -51,6 +57,11 @@ export default function CourseForm({ initialData, onSubmit }: CourseFormProps) {
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm font-medium">
           {error}
+        </div>
+      )}
+      {success && (
+        <div className="bg-green-50 text-green-600 p-4 rounded-lg text-sm font-medium">
+          {success}
         </div>
       )}
 

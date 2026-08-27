@@ -5,7 +5,7 @@ import { Button, Card, StatusPill } from "@/components/ui";
 import { getCourses } from "@/lib/services/courseService";
 
 export default async function InstructorCourses() {
-  const myCourses = await getCourses(); // Backend auto-filters for the instructor
+  const myCourses = await getCourses('instructorView=true'); // Backend auto-filters for the instructor
 
   return (
     <Page title="My Courses" subtitle="Courses you own and teach. You can only manage your own.">
@@ -19,7 +19,7 @@ export default async function InstructorCourses() {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <Link href={`/dashboard/instructor/courses/${c.slug || c.documentId}`} className="font-semibold hover:accent-text">
+                    <Link href={`/courses/${c.slug || c.documentId}/edit`} className="font-semibold hover:accent-text">
                       {c.title}
                     </Link>
                     <StatusPill status={c.status || (c.publishedAt ? 'published' : 'draft')} />
@@ -34,7 +34,7 @@ export default async function InstructorCourses() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
-                <Link href={`/dashboard/instructor/courses/${c.slug || c.documentId}`}>
+                <Link href={`/courses/${c.slug || c.documentId}/edit`}>
                   <Button size="sm" variant="outline">Edit</Button>
                 </Link>
                 <Link href="/dashboard/instructor/lessons">

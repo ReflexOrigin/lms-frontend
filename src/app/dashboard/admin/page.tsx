@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
   
   // Generate the last 6 months for the trend chart
   const currentMonthIdx = new Date().getMonth();
-  const enrollmentTrend = [];
+  const enrollmentTrend: { label: string; value: number }[] = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date();
     d.setMonth(currentMonthIdx - i);

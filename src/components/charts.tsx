@@ -78,7 +78,7 @@ export function LineChart({
   height = 200,
   color = "var(--accent, #4f46e5)",
 }: {
-  data: { month: string; value: number }[];
+  data: { label: string; value: number }[];
   height?: number;
   color?: string;
 }) {
@@ -117,7 +117,7 @@ export function LineChart({
         <g key={i}>
           <circle cx={x(i)} cy={y(d.value)} r={3.5} fill="var(--color-card)" stroke={color} strokeWidth={2} />
           <text x={x(i)} y={height - 8} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: 10 }}>
-            {d.label || d.month}
+            {d.label}
           </text>
         </g>
       ))}

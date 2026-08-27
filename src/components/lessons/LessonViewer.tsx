@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 // @ts-ignore
 const ReactPlayer: any = dynamic(() => import('react-player'), { ssr: false });
@@ -11,19 +12,28 @@ type LessonViewerProps = {
 };
 
 export default function LessonViewer({ content, videoUrl, onProgress }: LessonViewerProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  
+  // react-player works best with standard watch URLs rather than embed URLs
+  const normalizedUrl = videoUrl ? videoUrl.replace('youtube.com/embed/', 'youtube.com/watch?v=') : undefined;
+
   return (
     <div className="space-y-8">
-      {videoUrl && (
+      {mounted && normalizedUrl && (
         <div className="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-lg border border-gray-200">
           <ReactPlayer 
-            url={videoUrl}
+            src={normalizedUrl}
             width="100%"
             height="100%"
             controls={true}
-            onProgress={(state: any) => {
-              if (onProgress && state.played) {
-                // state.played is a decimal between 0 and 1
-                onProgress(state.played * 100);
+            onTimeUpdate={(e: any) => {
+              if (onProgress) {
+                const currentTime = e.target.currentTime;
+                const duration = e.target.duration;
+                if (duration && duration > 0) {
+                  onProgress((currentTime / duration) * 100);
+                }
               }
             }}
           />
