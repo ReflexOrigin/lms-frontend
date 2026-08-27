@@ -63,7 +63,7 @@ export default async function CourseDetailPage(props: { params: Promise<{ slug: 
               </ul>
               
               {/* Add Client Component EnrollButton here */}
-              <EnrollButton courseId={course.documentId} courseSlug={course.slug} />
+              <EnrollButton courseId={course.documentId} courseSlug={course.slug || course.documentId} />
             </div>
           </div>
         </div>
