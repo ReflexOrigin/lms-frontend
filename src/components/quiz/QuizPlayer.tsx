@@ -61,8 +61,9 @@ export default function QuizPlayer({ quiz, courseSlug }: QuizPlayerProps) {
             {q.options.map((opt: string, oIdx: number) => {
               const isSelected = answers[q.documentId] === oIdx;
               return (
-                <label 
+                <div 
                   key={oIdx}
+                  onClick={() => handleOptionSelect(q.documentId, oIdx)}
                   className={`block p-4 rounded-lg border-2 cursor-pointer transition-colors flex items-center gap-4 ${
                     isSelected 
                       ? 'border-blue-600 bg-blue-50' 
@@ -77,7 +78,7 @@ export default function QuizPlayer({ quiz, courseSlug }: QuizPlayerProps) {
                   <span className={`text-lg ${isSelected ? 'text-blue-900 font-medium' : 'text-gray-700'}`}>
                     {opt}
                   </span>
-                </label>
+                </div>
               );
             })}
           </div>
