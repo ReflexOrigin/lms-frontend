@@ -52,12 +52,12 @@ export default function LandingPage() {
             </Link>
           ) : (
             <>
-              <a href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
+              <button onClick={() => router.push('/login')} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
                 Log in
-              </a>
-              <a href="/register" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-10 px-4 text-sm accent-bg text-white hover:brightness-110 shadow-sm rounded-full hover:scale-105 font-medium">
+              </button>
+              <button onClick={() => router.push('/register')} className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-10 px-4 text-sm accent-bg text-white hover:brightness-110 shadow-sm rounded-full hover:scale-105 font-medium">
                 Get Started
-              </a>
+              </button>
             </>
           )}
         </div>
@@ -91,14 +91,14 @@ export default function LandingPage() {
               </Link>
             ) : (
               <>
-                <a href="/register" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-12 px-6 text-[15px] accent-bg text-white hover:brightness-110 shadow-sm rounded-full hover:scale-105 w-full sm:w-auto shadow-md">
+                <button onClick={() => router.push('/register')} className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-12 px-6 text-[15px] accent-bg text-white hover:brightness-110 shadow-sm rounded-full hover:scale-105 w-full sm:w-auto shadow-md">
                   Start Learning Free
                   <ArrowRight size={18} />
-                </a>
-                <Link href="/courses" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-12 px-6 text-[15px] border border-border bg-card text-foreground hover:bg-muted rounded-full hover:scale-105 w-full sm:w-auto">
+                </button>
+                <button onClick={() => router.push('/courses')} className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-12 px-6 text-[15px] border border-border bg-card text-foreground hover:bg-muted rounded-full hover:scale-105 w-full sm:w-auto">
                   <PlayCircle size={18} />
                   Browse courses
-                </Link>
+                </button>
               </>
             )}
           </div>
