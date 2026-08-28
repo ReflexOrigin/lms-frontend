@@ -10,7 +10,7 @@ export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const pathname = usePathname();
 
-  if (pathname?.startsWith('/dashboard')) {
+  if (pathname === '/' || pathname?.startsWith('/dashboard')) {
     return null;
   }
 
@@ -32,9 +32,9 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg accent-bg text-white flex items-center justify-center">
-                <span className="font-extrabold text-sm">LMS</span>
+                <span className="font-extrabold text-sm">P</span>
               </div>
-              <span>Platform</span>
+              <span>Praxis</span>
             </Link>
             <div className="hidden md:flex ml-10 space-x-8">
               <Link href="/courses" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -53,10 +53,9 @@ export default function Navbar() {
                   <>
                     <Link 
                       href={getDashboardLink()}
+                      className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] bg-muted text-foreground hover:bg-muted/80"
                     >
-                      <button className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] bg-muted text-foreground hover:bg-muted/80">
-                        Dashboard
-                      </button>
+                      Dashboard
                     </Link>
                     <div className="relative group">
                       <button className="flex items-center gap-2 p-1 rounded-full hover:bg-muted transition-colors border border-transparent focus:border-border outline-none">
@@ -82,17 +81,15 @@ export default function Navbar() {
                   <>
                     <Link 
                       href="/login" 
+                      className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                     >
-                      <button className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground">
-                        Log in
-                      </button>
+                      Log in
                     </Link>
                     <Link 
                       href="/register" 
+                      className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] accent-bg text-white hover:brightness-110 shadow-sm"
                     >
-                      <button className="flex items-center justify-center gap-2 font-medium rounded-lg transition-all h-8 px-3 text-[13px] accent-bg text-white hover:brightness-110">
-                        Sign up
-                      </button>
+                      Sign up
                     </Link>
                   </>
                 )}

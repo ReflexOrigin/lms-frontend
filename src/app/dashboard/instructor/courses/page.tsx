@@ -5,7 +5,7 @@ import { Button, Card, StatusPill } from "@/components/ui";
 import { getCourses } from "@/lib/services/courseService";
 
 export default async function InstructorCourses() {
-  const myCourses = await getCourses('instructorView=true'); // Backend auto-filters for the instructor
+  const myCourses = await getCourses('managerView=true'); // Backend auto-filters for the instructor
 
   return (
     <Page title="My Courses" subtitle="Courses you own and teach. You can only manage your own.">

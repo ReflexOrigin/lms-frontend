@@ -11,13 +11,16 @@ export function proxy(request: NextRequest) {
   if (userRole === 'administrator' || userRole === 'admin_role') userRole = 'admin';
   if (userRole === 'content_manager') userRole = 'manager';
 
-  // 1. If not logged in and trying to access a dashboard, redirect to login
-  if (!jwt && pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // 1. If not logged in and trying to access a protected route, redirect to homepage (/)
+  const isProtectedRoute = pathname.startsWith('/dashboard') || 
+                           pathname.startsWith('/courses/create') || 
+                           pathname.includes('/edit');
+  if (!jwt && isProtectedRoute) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // 2. If logged in and trying to access public auth pages or root, redirect to specific dashboard
-  if (jwt && userRole && (pathname === '/' || pathname === '/login' || pathname === '/register')) {
+  // 2. If logged in and trying to access public auth pages, redirect to specific dashboard
+  if (jwt && userRole && (pathname === '/login' || pathname === '/register')) {
     let dashPath = `/dashboard/${userRole}`;
     
     // Fallback if role doesn't match a dashboard

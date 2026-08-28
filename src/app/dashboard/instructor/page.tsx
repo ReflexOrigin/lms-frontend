@@ -7,7 +7,7 @@ import { getCurrentUser } from "@/lib/services/userService";
 
 export default async function InstructorDashboard() {
   const user = await getCurrentUser();
-  const myCourses = await getCourses('instructorView=true'); // Backend auto-filters by instructor
+  const myCourses = await getCourses('managerView=true'); // Backend auto-filters by instructor
 
   const totalStudents = myCourses.reduce((s, c) => s + (c.students || 0), 0);
   const avgCompletion = myCourses.length 

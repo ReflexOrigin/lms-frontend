@@ -113,16 +113,16 @@ const tones = ["#4f46e5", "#0d9488", "#d97706", "#db2777", "#2563eb", "#7c3aed",
 const tone = (i: number) => tones[i % tones.length];
 
 export const users: User[] = [
-  { id: "u1", name: "Aisha Rahman", email: "aisha.rahman@lumen.edu", role: "instructor", status: "active", courses: 4, lastActive: "Today", created: "Mar 2024", avatarTone: tone(0) },
-  { id: "u2", name: "Tanvir Ahmed", email: "tanvir.ahmed@lumen.edu", role: "student", status: "active", courses: 6, lastActive: "2h ago", created: "Jan 2025", avatarTone: tone(1) },
-  { id: "u3", name: "Sarah Karim", email: "sarah.karim@lumen.edu", role: "manager", status: "active", courses: 12, lastActive: "Yesterday", created: "Nov 2023", avatarTone: tone(2) },
-  { id: "u4", name: "Mahmud Hasan", email: "mahmud.hasan@lumen.edu", role: "instructor", status: "active", courses: 3, lastActive: "Today", created: "Jun 2024", avatarTone: tone(3) },
-  { id: "u5", name: "Nadia Islam", email: "nadia.islam@lumen.edu", role: "student", status: "suspended", courses: 2, lastActive: "12d ago", created: "Feb 2025", avatarTone: tone(4) },
-  { id: "u6", name: "Omar Faruk", email: "omar.faruk@lumen.edu", role: "admin", status: "active", courses: 0, lastActive: "Today", created: "Aug 2023", avatarTone: tone(5) },
-  { id: "u7", name: "Rifat Chowdhury", email: "rifat.c@lumen.edu", role: "student", status: "active", courses: 3, lastActive: "5h ago", created: "Mar 2025", avatarTone: tone(6) },
-  { id: "u8", name: "Layla Noor", email: "layla.noor@lumen.edu", role: "manager", status: "invited", courses: 0, lastActive: "Never", created: "Aug 2026", avatarTone: tone(0) },
-  { id: "u9", name: "Imran Kabir", email: "imran.kabir@lumen.edu", role: "instructor", status: "active", courses: 2, lastActive: "3h ago", created: "Sep 2024", avatarTone: tone(1) },
-  { id: "u10", name: "Fatima Zohra", email: "fatima.zohra@lumen.edu", role: "student", status: "active", courses: 5, lastActive: "1h ago", created: "Dec 2024", avatarTone: tone(2) },
+  { id: "u1", name: "Aisha Rahman", email: "aisha.rahman@praxis.edu", role: "instructor", status: "active", courses: 4, lastActive: "Today", created: "Mar 2024", avatarTone: tone(0) },
+  { id: "u2", name: "Tanvir Ahmed", email: "tanvir.ahmed@praxis.edu", role: "student", status: "active", courses: 6, lastActive: "2h ago", created: "Jan 2025", avatarTone: tone(1) },
+  { id: "u3", name: "Sarah Karim", email: "sarah.karim@praxis.edu", role: "manager", status: "active", courses: 12, lastActive: "Yesterday", created: "Nov 2023", avatarTone: tone(2) },
+  { id: "u4", name: "Mahmud Hasan", email: "mahmud.hasan@praxis.edu", role: "instructor", status: "active", courses: 3, lastActive: "Today", created: "Jun 2024", avatarTone: tone(3) },
+  { id: "u5", name: "Nadia Islam", email: "nadia.islam@praxis.edu", role: "student", status: "suspended", courses: 2, lastActive: "12d ago", created: "Feb 2025", avatarTone: tone(4) },
+  { id: "u6", name: "Omar Faruk", email: "omar.faruk@praxis.edu", role: "admin", status: "active", courses: 0, lastActive: "Today", created: "Aug 2023", avatarTone: tone(5) },
+  { id: "u7", name: "Rifat Chowdhury", email: "rifat.c@praxis.edu", role: "student", status: "active", courses: 3, lastActive: "5h ago", created: "Mar 2025", avatarTone: tone(6) },
+  { id: "u8", name: "Layla Noor", email: "layla.noor@praxis.edu", role: "manager", status: "invited", courses: 0, lastActive: "Never", created: "Aug 2026", avatarTone: tone(0) },
+  { id: "u9", name: "Imran Kabir", email: "imran.kabir@praxis.edu", role: "instructor", status: "active", courses: 2, lastActive: "3h ago", created: "Sep 2024", avatarTone: tone(1) },
+  { id: "u10", name: "Fatima Zohra", email: "fatima.zohra@praxis.edu", role: "student", status: "active", courses: 5, lastActive: "1h ago", created: "Dec 2024", avatarTone: tone(2) },
 ];
 
 function mkLessons(names: [string, string][], base = 0): Lesson[] {

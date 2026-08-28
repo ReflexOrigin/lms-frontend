@@ -2,7 +2,7 @@ import { getBlogPosts } from '@/lib/actions/blog';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Blog | LMS Platform',
+  title: 'Blog | Praxis',
   description: 'Latest news, updates, and articles from our platform.',
 };
 

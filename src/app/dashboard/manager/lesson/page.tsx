@@ -10,7 +10,7 @@ export default function LessonEditor() {
   const [body, setBody] = useState(
     "Cross-validation gives us an honest estimate of how a model will perform on unseen data. Rather than trusting a single train/test split, we rotate through folds so every observation is used for both training and validation.\n\nThe bias-variance tradeoff frames the tension: simple models underfit (high bias), while overly flexible models overfit (high variance). Our job is to find the sweet spot.",
   );
-  const [video, setVideo] = useState("https://videos.lumen.edu/ml-eval-intro");
+  const [video, setVideo] = useState("https://videos.praxis.edu/ml-eval-intro");
 
   return (
     <Page

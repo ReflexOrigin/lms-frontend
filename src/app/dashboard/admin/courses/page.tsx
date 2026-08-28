@@ -4,6 +4,7 @@ import { Page, NewButton } from "@/components/Page";
 import { Button, Card, StatusPill } from "@/components/ui";
 import { fetchWithAuth } from "@/lib/api";
 import CourseFilter from "./CourseFilter";
+import DeleteCourseButton from "./DeleteCourseButton";
 
 export default async function AdminCourses({ searchParams }: { searchParams: any }) {
   const query = searchParams?.q?.toLowerCase() || "";
@@ -99,12 +100,10 @@ export default async function AdminCourses({ searchParams }: { searchParams: any
                         <Link href={`/dashboard/admin/courses/${c.documentId}`} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center">
                           <Eye size={16} />
                         </Link>
-                        <button className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center">
+                        <Link href={`/courses/${c.slug || c.documentId}/edit`} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center">
                           <Pencil size={16} />
-                        </button>
-                        <button className="w-8 h-8 rounded-lg hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] flex items-center justify-center">
-                          <Trash2 size={16} />
-                        </button>
+                        </Link>
+                        <DeleteCourseButton documentId={c.documentId} />
                       </div>
                     </td>
                   </tr>

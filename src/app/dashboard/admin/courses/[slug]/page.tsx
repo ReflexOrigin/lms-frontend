@@ -14,7 +14,7 @@ export default async function AdminCourseDetail({ params }: { params: { slug: st
       course = (await courseRes.json()).data;
     }
 
-    const enrollmentsRes = await fetchWithAuth(`/api/enrollments?filters[course][documentId][$eq]=${documentId}&populate=user,completedLessons`);
+    const enrollmentsRes = await fetchWithAuth(`/api/enrollments?filters[course][documentId][$eq]=${documentId}&populate=student`);
     if (enrollmentsRes.ok) {
       enrollments = (await enrollmentsRes.json()).data || [];
     }

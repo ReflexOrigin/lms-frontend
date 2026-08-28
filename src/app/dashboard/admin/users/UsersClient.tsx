@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { AlertTriangle, Ban, MoreHorizontal, Search, Trash2, UserCog } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AlertTriangle, Ban, CheckCircle, MoreHorizontal, Search, Trash2, UserCog } from "lucide-react";
 import { Page, NewButton } from "@/components/Page";
 import {
   Avatar,
@@ -31,18 +32,19 @@ const roleLabels: Record<Role, string> = {
   student: "Student",
 };
 
-export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
+export default function UsersClient({ initialUsers, roles }: { initialUsers: any[]; roles: any[] }) {
+  const router = useRouter();
   const toast = useToast();
-  const [users, setUsers] = useState<any[]>(initialUsers);
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [menuFor, setMenuFor] = useState<string | null>(null);
 
   const [roleEditor, setRoleEditor] = useState<any | null>(null);
-  const [newRole, setNewRole] = useState<Role>("student");
-  const [confirm, setConfirm] = useState<{ user: any; action: "suspend" | "delete" } | null>(null);
+  const [newRoleId, setNewRoleId] = useState<number | null>(null);
+  const [confirm, setConfirm] = useState<{ user: any; action: "suspend" | "unsuspend" | "delete" } | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  let list = users;
+  let list = initialUsers;
   if (roleFilter !== "all") {
     list = list.filter((u) => {
       const normalizedRole = u.role?.name?.toLowerCase() || 'student';
@@ -64,46 +66,56 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
 
   const openRoleEditor = (u: any) => {
     setMenuFor(null);
-    setNewRole(u.role?.name?.toLowerCase() as Role || "student");
+    setNewRoleId(u.role?.id || null);
     setRoleEditor(u);
   };
 
   const applyRole = async () => {
-    if (!roleEditor) return;
-    
-    // In a real app, we'd PUT to /api/users/:id or /api/users-permissions/roles
-    // For now, update local state to mock the API success
-    setUsers((us) => us.map((u) => {
-      if (u.documentId === roleEditor.documentId) {
-        return { ...u, role: { ...u.role, name: newRole } };
-      }
-      return u;
-    }));
-    
-    toast(`${roleEditor.username || 'User'} role updated successfully`, "success");
-    setRoleEditor(null);
+    if (!roleEditor || !newRoleId) return;
+    setLoading(true);
+    try {
+      const { updateUserRole } = await import('@/lib/actions/admin');
+      await updateUserRole(roleEditor.documentId, newRoleId);
+      toast(`${roleEditor.username || 'User'} role updated successfully`, "success");
+      setRoleEditor(null);
+      router.refresh();
+    } catch (err: any) {
+      toast(err.message || 'Failed to update role', "danger");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const applyConfirm = async () => {
     if (!confirm) return;
-    
-    // In a real app, we'd DELETE /api/users/:id or PUT /api/users/:id (blocked: true)
-    if (confirm.action === "delete") {
-      setUsers((us) => us.filter((u) => u.documentId !== confirm.user.documentId));
-      toast(`${confirm.user.username || 'User'} was removed`, "danger");
-    } else {
-      setUsers((us) =>
-        us.map((u) => (u.documentId === confirm.user.documentId ? { ...u, blocked: true } : u))
-      );
-      toast(`${confirm.user.username || 'User'} was suspended`, "warning");
+    setLoading(true);
+    try {
+      if (confirm.action === "delete") {
+        const { deleteUser } = await import('@/lib/actions/admin');
+        await deleteUser(confirm.user.documentId);
+        toast(`${confirm.user.username || 'User'} was removed`, "danger");
+      } else {
+        const blocked = confirm.action === "suspend";
+        const { suspendUser } = await import('@/lib/actions/admin');
+        await suspendUser(confirm.user.documentId, blocked);
+        toast(
+          `${confirm.user.username || 'User'} was ${blocked ? 'suspended' : 'unsuspended'}`,
+          blocked ? "warning" : "success"
+        );
+      }
+      setConfirm(null);
+      router.refresh();
+    } catch (err: any) {
+      toast(err.message || 'Action failed', "danger");
+    } finally {
+      setLoading(false);
     }
-    setConfirm(null);
   };
 
   return (
     <Page
       title="User Management"
-      subtitle={`${users.length} accounts across all roles`}
+      subtitle={`${initialUsers.length} accounts across all roles`}
       actions={<NewButton label="Invite user" />}
     >
       <Card className="overflow-hidden">
@@ -178,11 +190,12 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                             <button
                               onClick={() => {
                                 setMenuFor(null);
-                                setConfirm({ user: u, action: "suspend" });
+                                setConfirm({ user: u, action: u.blocked ? "unsuspend" : "suspend" });
                               }}
                               className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm hover:bg-muted"
                             >
-                              <Ban size={15} /> Suspend
+                              {u.blocked ? <CheckCircle size={15} /> : <Ban size={15} />}
+                              {u.blocked ? 'Unsuspend' : 'Suspend'}
                             </button>
                             <button
                               onClick={() => {
@@ -217,8 +230,8 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
             <Button variant="outline" onClick={() => setRoleEditor(null)}>
               Cancel
             </Button>
-            <Button onClick={applyRole} disabled={newRole === roleEditor?.role?.name?.toLowerCase()}>
-              Apply change
+            <Button onClick={applyRole} disabled={loading || newRoleId === roleEditor?.role?.id}>
+              {loading ? 'Applying…' : 'Apply change'}
             </Button>
           </>
         }
@@ -235,25 +248,22 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
 
             <div className="mt-4">
               <Field label="Assign role">
-                <Select value={newRole} onChange={(e) => setNewRole(e.target.value as Role)}>
-                  <option value="admin">Administrator</option>
-                  <option value="manager">Content Manager</option>
-                  <option value="instructor">Instructor</option>
-                  <option value="student">Student</option>
+                <Select value={newRoleId ?? ''} onChange={(e) => setNewRoleId(Number(e.target.value))}>
+                  {roles.map((r: any) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
                 </Select>
               </Field>
             </div>
 
-            {newRole !== roleEditor.role?.name?.toLowerCase() && (
+            {newRoleId !== roleEditor?.role?.id && (
               <div className="mt-4 flex items-start gap-2.5 p-3 rounded-xl bg-[var(--color-warning-soft)] text-[var(--color-warning)] text-sm">
                 <AlertTriangle size={16} className="shrink-0 mt-0.5" />
                 <p>
                   Change {roleEditor.username} from{" "}
                   <strong>{roleEditor.role?.name || 'Student'}</strong> to{" "}
-                  <strong>{roleLabels[newRole]}</strong>?{" "}
-                  {newRole === "admin"
-                    ? "This grants full platform control, including user management."
-                    : "This immediately changes their permissions and navigation."}
+                  <strong>{roles.find((r: any) => r.id === newRoleId)?.name || 'Unknown'}</strong>?{" "}
+                  This immediately changes their permissions and navigation.
                 </p>
               </div>
             )}
@@ -265,14 +275,14 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
       <Modal
         open={!!confirm}
         onClose={() => setConfirm(null)}
-        title={confirm?.action === "delete" ? "Delete user" : "Suspend user"}
+        title={confirm?.action === "delete" ? "Delete user" : confirm?.action === "suspend" ? "Suspend user" : "Unsuspend user"}
         footer={
           <>
             <Button variant="outline" onClick={() => setConfirm(null)}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={applyConfirm}>
-              {confirm?.action === "delete" ? "Delete account" : "Suspend account"}
+            <Button variant={confirm?.action === "unsuspend" ? "primary" : "danger"} onClick={applyConfirm} disabled={loading}>
+              {loading ? 'Processing…' : confirm?.action === "delete" ? "Delete account" : confirm?.action === "suspend" ? "Suspend account" : "Unsuspend account"}
             </Button>
           </>
         }
@@ -288,10 +298,15 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                   Permanently delete <strong className="text-foreground">{confirm.user.username}</strong>? This
                   revokes all access and cannot be undone.
                 </>
-              ) : (
+              ) : confirm.action === "suspend" ? (
                 <>
                   Suspend <strong className="text-foreground">{confirm.user.username}</strong>? They will be
                   signed out and unable to access the platform until reinstated.
+                </>
+              ) : (
+                <>
+                  Unsuspend <strong className="text-foreground">{confirm.user.username}</strong>? They will
+                  regain access to the platform immediately.
                 </>
               )}
             </p>

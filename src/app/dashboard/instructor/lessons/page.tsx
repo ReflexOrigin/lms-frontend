@@ -7,8 +7,8 @@ import { getCourses } from "@/lib/services/courseService";
 export default async function InstructorLessons() {
   let myCourses: any[] = [];
   try {
-    // Fetch courses and populate their lessons. getCourses handles the instructorView flag.
-    myCourses = await getCourses('instructorView=true');
+    // Fetch courses and populate their lessons. getCourses handles the managerView flag.
+    myCourses = await getCourses('managerView=true');
   } catch (error) {
     console.error("Failed to fetch instructor lessons", error);
   }

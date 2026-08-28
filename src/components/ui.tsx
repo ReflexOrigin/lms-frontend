@@ -12,9 +12,8 @@ import {
 } from "react";
 import { AlertTriangle, Check, Inbox, Loader2, RefreshCw, X } from "lucide-react";
 
-export function cx(...parts: (string | false | null | undefined)[]) {
-  return parts.filter(Boolean).join(" ");
-}
+import { cx } from "@/lib/utils";
+export { cx };
 
 /* ---------- Button ---------- */
 type Variant = "primary" | "secondary" | "ghost" | "danger" | "outline";

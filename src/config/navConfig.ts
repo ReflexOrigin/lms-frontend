@@ -64,7 +64,7 @@ export const navConfig: Record<Role, { home: string; sections: NavSection[] }> =
       {
         heading: "Authoring",
         items: [
-          { label: "Course Builder", to: "/dashboard/manager/builder", icon: PenSquare },
+          { label: "Course Builder", to: "/courses/create", icon: PenSquare },
           { label: "Lesson Editor", to: "/dashboard/manager/lesson", icon: FileText },
           { label: "Quiz Builder", to: "/dashboard/manager/quiz", icon: ListChecks },
           { label: "Blog Editor", to: "/dashboard/manager/blog", icon: Newspaper },

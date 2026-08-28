@@ -9,8 +9,8 @@ export default async function ContentProgress() {
   
   try {
     const [coursesRes, enrollmentsRes] = await Promise.all([
-      fetchWithAuth('/api/courses'),
-      fetchWithAuth('/api/enrollments')
+      fetchWithAuth('/api/courses?populate=lessons&managerView=true'),
+      fetchWithAuth('/api/enrollments?populate=student,course')
     ]);
 
     if (coursesRes.ok) courses = (await coursesRes.json()).data || [];

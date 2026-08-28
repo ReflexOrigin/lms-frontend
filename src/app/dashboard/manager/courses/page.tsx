@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { LayoutGrid, List, PenSquare } from "lucide-react";
 import { Page, NewButton } from "@/components/Page";
-import { Badge, Card, StatusPill, cx } from "@/components/ui";
+import { Badge, Card, StatusPill } from "@/components/ui";
+import { cx } from "@/lib/utils";
 import { fetchWithAuth } from "@/lib/api";
 
 export default async function CourseLibrary({ searchParams }: { searchParams: { view?: string, status?: string } }) {
@@ -10,7 +11,7 @@ export default async function CourseLibrary({ searchParams }: { searchParams: { 
 
   let courses: any[] = [];
   try {
-    const res = await fetchWithAuth('/api/courses?populate=lessons');
+    const res = await fetchWithAuth('/api/courses?populate=lessons&managerView=true');
     if (res.ok) {
       courses = (await res.json()).data || [];
     }
@@ -28,7 +29,7 @@ export default async function CourseLibrary({ searchParams }: { searchParams: { 
     <Page
       title="Course Library"
       subtitle="Author, organize, and publish the platform's courses."
-      actions={<Link href="/dashboard/manager/builder"><NewButton label="New course" /></Link>}
+      actions={<Link href="/courses/create"><NewButton label="New course" /></Link>}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex gap-1.5">
@@ -58,7 +59,7 @@ export default async function CourseLibrary({ searchParams }: { searchParams: { 
       {view === "grid" ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {list.map((c) => (
-            <Link key={c.documentId} href={`/dashboard/manager/builder/${c.documentId}`} className="group bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition">
+            <Link key={c.documentId} href={`/courses/${c.documentId}/edit`} className="group bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition">
               <div className="aspect-[16/9] bg-blue-50 flex items-center justify-center relative">
                 <span className="text-blue-400 font-medium text-sm">Course Cover</span>
                 <div className="absolute top-3 right-3">
@@ -88,7 +89,7 @@ export default async function CourseLibrary({ searchParams }: { searchParams: { 
       ) : (
         <Card className="divide-y divide-border">
           {list.map((c) => (
-            <Link key={c.documentId} href={`/dashboard/manager/builder/${c.documentId}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-muted/40">
+            <Link key={c.documentId} href={`/courses/${c.documentId}/edit`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-muted/40">
               <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                 <span className="text-blue-400 font-medium text-xs">Cover</span>
               </div>

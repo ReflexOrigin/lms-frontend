@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
   ChevronDown,
@@ -25,10 +25,10 @@ export interface Persona {
 }
 
 export const personas: Record<Role, Persona> = {
-  admin: { role: "admin", name: "Omar Faruk", email: "omar.faruk@lumen.edu", avatarTone: "#4f46e5" },
-  manager: { role: "manager", name: "Sarah Karim", email: "sarah.karim@lumen.edu", avatarTone: "#7c3aed" },
-  instructor: { role: "instructor", name: "Aisha Rahman", email: "aisha.rahman@lumen.edu", avatarTone: "#0d9488" },
-  student: { role: "student", name: "Alex Morgan", email: "alex.morgan@lumen.edu", avatarTone: "#2563eb" },
+  admin: { role: "admin", name: "Omar Faruk", email: "omar.faruk@praxis.edu", avatarTone: "#4f46e5" },
+  manager: { role: "manager", name: "Sarah Karim", email: "sarah.karim@praxis.edu", avatarTone: "#7c3aed" },
+  instructor: { role: "instructor", name: "Aisha Rahman", email: "aisha.rahman@praxis.edu", avatarTone: "#0d9488" },
+  student: { role: "student", name: "Alex Morgan", email: "alex.morgan@praxis.edu", avatarTone: "#2563eb" },
 };
 
 function Sidebar({ role, user, onNavigate }: { role: Role; user: any; onNavigate?: () => void }) {
@@ -47,7 +47,7 @@ function Sidebar({ role, user, onNavigate }: { role: Role; user: any; onNavigate
           <GraduationCap size={18} />
         </div>
         <div>
-          <div className="font-semibold text-[15px] leading-none">Lumen</div>
+          <div className="font-semibold text-[15px] leading-none">Praxis</div>
           <div className="text-[11px] text-muted-foreground mt-1">{meta.label} workspace</div>
         </div>
       </div>
@@ -109,10 +109,17 @@ function crumbsFor(pathname: string) {
 }
 
 export default function AppShell({ role, children }: { role: Role; children: React.ReactNode }) {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [drawer, setDrawer] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/");
+    }
+  }, [user, loading, router]);
 
   const meta = roleMeta[role];
   const crumbs = crumbsFor(pathname || "");

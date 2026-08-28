@@ -55,9 +55,9 @@ export async function getCourses(filters = '') {
   }
 }
 
-export async function getCourse(slug: string, instructorView = false) {
+export async function getCourse(slug: string, managerView = false) {
   try {
-    const baseQuery = instructorView ? '&instructorView=true' : '';
+    const baseQuery = managerView ? '&managerView=true' : '';
     // Populate instructor, lessons. Try slug first.
     let res = await fetchWithAuth(`/courses?filters[slug][$eq]=${slug}&populate[0]=instructor&populate[1]=lessons${baseQuery}`, { cache: 'no-store' });
     

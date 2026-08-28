@@ -58,3 +58,11 @@ export async function getAllRoles() {
   const res = await fetchWithAuth('/users-permissions/roles');
   return res.roles;
 }
+
+export async function suspendUser(userId: string, blocked: boolean) {
+  const res = await fetchWithAuth(`/admin-custom/users/${userId}/suspend`, {
+    method: 'PUT',
+    body: JSON.stringify({ data: { blocked } })
+  });
+  return res.data;
+}

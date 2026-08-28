@@ -44,7 +44,9 @@ export default function AdminCourseClient({ course, enrollments }: { course: any
                 <h1 className="text-xl font-semibold tracking-tight">{course.title}</h1>
                 <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{course.description}</p>
               </div>
-              <Button variant="outline">Edit course</Button>
+              <Link href={`/courses/${course.slug || course.documentId}/edit`}>
+                <Button variant="outline">Edit course</Button>
+              </Link>
             </div>
             <div className="flex flex-wrap items-center gap-6 mt-4 text-sm">
               <span className="flex items-center gap-2">
@@ -136,8 +138,8 @@ export default function AdminCourseClient({ course, enrollments }: { course: any
                   <tr key={s.documentId} className="border-b border-border last:border-0 hover:bg-muted/40">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2.5">
-                        <Avatar name={s.user?.username || 'Unknown'} size={30} />
-                        <span className="font-medium">{s.user?.username || 'Unknown'}</span>
+                        <Avatar name={s.student?.username || 'Unknown'} size={30} />
+                        <span className="font-medium">{s.student?.username || 'Unknown'}</span>
                       </div>
                     </td>
                     <td className="px-3 py-3 w-48">
@@ -147,7 +149,7 @@ export default function AdminCourseClient({ course, enrollments }: { course: any
                       </div>
                     </td>
                     <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">
-                      {s.completedLessons?.length || 0}/{lessons.length}
+                      {Math.round(((s.progressPercentage || 0) / 100) * lessons.length)}/{lessons.length}
                     </td>
                     <td className="px-5 py-3 text-muted-foreground">{new Date(s.createdAt).toLocaleDateString()}</td>
                   </tr>

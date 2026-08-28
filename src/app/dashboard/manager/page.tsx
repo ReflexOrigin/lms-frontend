@@ -12,7 +12,7 @@ export default async function ManagerDashboard() {
   
   try {
     const [coursesRes, enrollmentsRes, blogsRes] = await Promise.all([
-      fetchWithAuth('/api/courses?populate=lessons'),
+      fetchWithAuth('/api/courses?populate=lessons&managerView=true'),
       fetchWithAuth('/api/enrollments'),
       fetchWithAuth('/api/blog-posts').catch(() => ({ ok: false, json: () => ({ data: [] }) })) // Fallback if blogs don't exist yet
     ]);
@@ -49,7 +49,7 @@ export default async function ManagerDashboard() {
               <Newspaper size={16} /> Write post
             </Button>
           </Link>
-          <Link href="/dashboard/manager/builder">
+          <Link href="/courses/create">
             <Button>
               <PenSquare size={16} /> New course
             </Button>
@@ -86,7 +86,7 @@ export default async function ManagerDashboard() {
             {recent.map((c) => (
               <Link
                 key={c.documentId}
-                href="/dashboard/manager/builder"
+                href={`/courses/${c.documentId}/edit`}
                 className="flex gap-3 p-3 rounded-xl border border-border hover:border-[var(--accent)] hover:shadow-sm transition"
               >
                 <div className="w-16 h-16 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
