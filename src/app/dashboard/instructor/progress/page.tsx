@@ -8,7 +8,7 @@ import { fetchWithAuth } from "@/lib/api";
 export default async function InstructorStudentProgress() {
   let enrollments: any[] = [];
   try {
-    const res = await fetchWithAuth('/api/enrollments?populate=course.lessons,user');
+    const res = await fetchWithAuth('/api/enrollments?populate=course,student');
     if (res.ok) {
       const data = await res.json();
       enrollments = data.data || [];
@@ -56,7 +56,7 @@ export default async function InstructorStudentProgress() {
           {atRisk.length > 0 ? (
             <div className="p-3 space-y-2">
               {atRisk.map((s) => {
-                const userName = s.user?.username || 'Unknown Student';
+                const userName = s.student?.username || 'Unknown Student';
                 return (
                   <Link
                     key={s.documentId}
@@ -99,7 +99,7 @@ export default async function InstructorStudentProgress() {
           </thead>
           <tbody>
             {enrollments.length > 0 ? enrollments.map((s) => {
-              const userName = s.user?.username || 'Unknown Student';
+              const userName = s.student?.username || 'Unknown Student';
               const p = s.progressPercentage || 0;
               const isAtRisk = p < 30 && p > 0;
               
