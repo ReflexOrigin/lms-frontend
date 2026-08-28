@@ -32,7 +32,7 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <header className="relative z-20 flex items-center justify-between px-6 lg:px-8 h-20 max-w-[1200px] mx-auto w-full bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0">
+      <header className="relative z-50 flex items-center justify-between px-6 lg:px-8 h-20 max-w-[1200px] mx-auto w-full bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0">
         <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
           <div className="w-9 h-9 rounded-xl accent-bg flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform duration-300">
             <span className="font-extrabold text-sm">P</span>
@@ -52,12 +52,12 @@ export default function LandingPage() {
             </Link>
           ) : (
             <>
-              <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
+              <a href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
                 Log in
-              </Link>
-              <Link href="/register" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none accent-ring select-none h-10 px-4 text-sm accent-bg text-white hover:brightness-110 shadow-sm rounded-full hover:scale-105 font-medium">
+              </a>
+              <a href="/register" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-10 px-4 text-sm accent-bg text-white hover:brightness-110 shadow-sm rounded-full hover:scale-105 font-medium">
                 Get Started
-              </Link>
+              </a>
             </>
           )}
         </div>
@@ -91,11 +91,11 @@ export default function LandingPage() {
               </Link>
             ) : (
               <>
-                <Link href="/register" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none accent-ring select-none h-12 px-6 text-[15px] accent-bg text-white hover:brightness-110 shadow-sm rounded-full hover:scale-105 w-full sm:w-auto shadow-md">
+                <a href="/register" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-12 px-6 text-[15px] accent-bg text-white hover:brightness-110 shadow-sm rounded-full hover:scale-105 w-full sm:w-auto shadow-md">
                   Start Learning Free
                   <ArrowRight size={18} />
-                </Link>
-                <Link href="/courses" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none accent-ring select-none h-12 px-6 text-[15px] border border-border bg-card text-foreground hover:bg-muted rounded-full hover:scale-105 w-full sm:w-auto">
+                </a>
+                <Link href="/courses" className="inline-flex items-center justify-center gap-2 font-medium rounded-[10px] transition-all duration-150 accent-ring select-none h-12 px-6 text-[15px] border border-border bg-card text-foreground hover:bg-muted rounded-full hover:scale-105 w-full sm:w-auto">
                   <PlayCircle size={18} />
                   Browse courses
                 </Link>
