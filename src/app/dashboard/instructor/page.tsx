@@ -9,12 +9,12 @@ export default async function InstructorDashboard() {
   const user = await getCurrentUser();
   const myCourses = await getCourses('', true); // Backend auto-filters by instructor
 
-  const totalStudents = myCourses.reduce((s, c) => s + (c.students || 0), 0);
+  const totalStudents = myCourses.reduce((s: number, c: any) => s + (c.students || 0), 0);
   const avgCompletion = myCourses.length 
-    ? Math.round(myCourses.reduce((s, c) => s + (c.completion || 0), 0) / myCourses.length) 
+    ? Math.round(myCourses.reduce((s: number, c: any) => s + (c.completion || 0), 0) / myCourses.length) 
     : 0;
   const avgQuiz = myCourses.length 
-    ? Math.round(myCourses.reduce((s, c) => s + (c.quizAvg || 0), 0) / myCourses.length) 
+    ? Math.round(myCourses.reduce((s: number, c: any) => s + (c.quizAvg || 0), 0) / myCourses.length) 
     : 0;
   
   // Dummy fallback for atRisk since we don't have a progress API endpoint fully built in UI yet
@@ -60,7 +60,7 @@ export default async function InstructorDashboard() {
       
       {myCourses.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {myCourses.map((c) => (
+          {myCourses.map((c: any) => (
             <Card key={c.documentId} className="overflow-hidden flex flex-col">
               <div className="aspect-[16/8] bg-muted overflow-hidden relative">
                 <div className="w-full h-full bg-blue-50 flex items-center justify-center">
