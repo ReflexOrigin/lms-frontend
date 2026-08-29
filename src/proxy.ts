@@ -3,6 +3,26 @@ import type { NextRequest } from 'next/server';
 
 export function proxy(request: NextRequest) {
   const jwt = request.cookies.get('jwt')?.value;
+  
+  // Check if JWT is expired. If so, clear cookies and redirect to login
+  if (jwt) {
+    try {
+      const payload = JSON.parse(atob(jwt.split('.')[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        const res = NextResponse.redirect(new URL('/login?expired=1', request.url));
+        res.cookies.delete('jwt');
+        res.cookies.delete('user_role');
+        return res;
+      }
+    } catch (e) {
+      // Invalid JWT format
+      const res = NextResponse.redirect(new URL('/login', request.url));
+      res.cookies.delete('jwt');
+      res.cookies.delete('user_role');
+      return res;
+    }
+  }
+
   let userRole = request.cookies.get('user_role')?.value?.toLowerCase();
   const { pathname } = request.nextUrl;
 

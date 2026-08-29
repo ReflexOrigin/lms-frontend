@@ -50,10 +50,8 @@ export default function BlogEditorClient({
         await updateBlogPost(documentId, payload);
       } else {
         const res = await createBlogPost(payload);
-        newDocId = res.documentId;
+        newDocId = res.data?.documentId || res.documentId;
         setDocumentId(newDocId);
-        // Replace URL so back button works better
-        window.history.replaceState(null, '', `${returnPath}/${newDocId}`);
       }
       
       if (publish && newDocId) {
@@ -64,7 +62,7 @@ export default function BlogEditorClient({
         toast("Draft saved successfully", "info");
       }
       
-      router.refresh();
+      router.push(returnPath);
       
     } catch (error: any) {
       toast(error.message || "Failed to save post", "danger");

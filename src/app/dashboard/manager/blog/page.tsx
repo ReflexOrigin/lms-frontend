@@ -12,6 +12,6 @@ export default async function ManagerBlog() {
     console.error("Failed to fetch manager blogs", error);
   }
 
-  return <BlogClient initialPosts={blogs} />;
+  return <BlogClient initialPosts={blogs} basePath="/dashboard/manager/blog" />;
 }
 

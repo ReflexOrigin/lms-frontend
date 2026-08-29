@@ -29,9 +29,10 @@ async function fetchWithAuth(path: string, options: RequestInit = {}) {
   return res.json();
 }
 
-export async function getQuizForCourse(courseId: string) {
-  const res = await fetchWithAuth(`/quizzes?filters[course][documentId][$eq]=${courseId}&populate=questions`);
-  return res.data[0]; // course has one quiz in our schema
+export async function getQuizForCourse(courseId: string, managerView = false) {
+  const headers = managerView ? { 'x-manager-view': 'true' } : {};
+  const res = await fetchWithAuth(`/quizzes?filters[course][documentId][$eq]=${courseId}&populate=questions`, { cache: 'no-store', headers });
+  return res.data?.[0]; // course has one quiz in our schema
 }
 
 export async function createQuiz(courseId: string, title: string) {

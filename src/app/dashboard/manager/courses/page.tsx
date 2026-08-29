@@ -5,13 +5,14 @@ import { Badge, Card, StatusPill } from "@/components/ui";
 import { cx } from "@/lib/utils";
 import { fetchWithAuth } from "@/lib/api";
 
-export default async function CourseLibrary({ searchParams }: { searchParams: { view?: string, status?: string } }) {
+export default async function CourseLibrary(props: { searchParams: Promise<{ view?: string, status?: string }> }) {
+  const searchParams = await props.searchParams;
   const view = searchParams.view === "list" ? "list" : "grid";
   const statusFilter = searchParams.status || "all";
 
   let courses: any[] = [];
   try {
-    const res = await fetchWithAuth('/api/courses?populate=lessons&managerView=true');
+    const res = await fetchWithAuth('/api/courses?populate=lessons', { headers: { 'x-manager-view': 'true' } });
     if (res.ok) {
       courses = (await res.json()).data || [];
     }

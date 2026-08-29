@@ -35,7 +35,7 @@ export default async function StudentQuizzes() {
                   <div className="font-medium text-sm">{q.title}</div>
                   <div className="text-xs text-muted-foreground">{q.course?.title || 'General'} · {q.questions?.length || 0} questions</div>
                 </div>
-                <Link href={`/dashboard/student/quizzes/${q.documentId}`}>
+                <Link href={`/courses/${q.course?.slug || q.course?.documentId}/quiz`}>
                   <Button size="sm">
                     <Play size={14} /> Start
                   </Button>

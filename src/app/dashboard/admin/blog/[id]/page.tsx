@@ -10,10 +10,11 @@ export default async function AdminBlogEditorPage({ params }: { params: any }) {
   
   if (id !== 'new') {
     try {
-      const res = await fetchWithAuth(`/api/blog-posts/${id}?populate=author`);
+      const res = await fetchWithAuth(`/api/blog-posts/${id}?populate=author&status=draft`);
       if (!res.ok) {
         if (res.status === 404) return notFound();
-        throw new Error('Failed to fetch post');
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(`Failed to fetch post: ${JSON.stringify(errData)}`);
       }
       const data = await res.json();
       initialData = data.data;

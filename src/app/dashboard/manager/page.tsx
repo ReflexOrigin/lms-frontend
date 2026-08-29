@@ -12,7 +12,7 @@ export default async function ManagerDashboard() {
   
   try {
     const [coursesRes, enrollmentsRes, blogsRes] = await Promise.all([
-      fetchWithAuth('/api/courses?populate=lessons&managerView=true'),
+      fetchWithAuth('/api/courses?populate=lessons', { headers: { 'x-manager-view': 'true' } }),
       fetchWithAuth('/api/enrollments'),
       fetchWithAuth('/api/blog-posts').catch(() => ({ ok: false, json: () => ({ data: [] }) })) // Fallback if blogs don't exist yet
     ]);

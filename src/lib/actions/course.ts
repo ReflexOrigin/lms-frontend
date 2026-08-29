@@ -22,18 +22,16 @@ async function fetchWithAuth(path: string, options: RequestInit = {}) {
     headers,
   });
 
-  // If the request fails with 401 and we sent a token, it might be expired.
-  // Retry without the token to see if the route is public.
+  // We attempt to delete cookies to force a clean logout state.
+  // This will only work if called within a Server Action or Route Handler.
+  // For Server Components, we rely on proxy.ts to catch expired JWTs.
   if (res.status === 401 && jwt) {
-    const retryHeaders = new Headers(options.headers);
-    if (!retryHeaders.has('Content-Type') && !(options.body instanceof FormData)) {
-      retryHeaders.set('Content-Type', 'application/json');
+    try {
+      cookieStore.delete('jwt');
+      cookieStore.delete('user_role');
+    } catch (e) {
+      // Ignored: Cannot modify cookies in a Server Component
     }
-    res = await fetch(`${STRAPI_URL}/api${path}`, {
-      cache: 'no-store',
-      ...options,
-      headers: retryHeaders,
-    });
   }
 
   if (!res.ok) {
@@ -41,13 +39,15 @@ async function fetchWithAuth(path: string, options: RequestInit = {}) {
     throw new Error(errorData.error?.message || `Strapi error: ${res.statusText}`);
   }
 
+  if (res.status === 204) return null;
   return res.json();
 }
 
-export async function getCourses(filters = '') {
+export async function getCourses(filters = '', managerView = false) {
   try {
+    const headers = managerView ? { 'x-manager-view': 'true' } : {};
     // Populate instructor and lessons by default for course cards
-    const res = await fetchWithAuth(`/courses?populate[0]=instructor&populate[1]=lessons${filters ? '&' + filters : ''}`, { cache: 'no-store' });
+    const res = await fetchWithAuth(`/courses?populate[0]=instructor&populate[1]=lessons${filters ? '&' + filters : ''}`, { cache: 'no-store', headers });
     return res.data || [];
   } catch (error) {
     console.error('Error fetching courses:', error);
@@ -57,13 +57,13 @@ export async function getCourses(filters = '') {
 
 export async function getCourse(slug: string, managerView = false) {
   try {
-    const baseQuery = managerView ? '&managerView=true' : '';
+    const headers = managerView ? { 'x-manager-view': 'true' } : {};
     // Populate instructor, lessons. Try slug first.
-    let res = await fetchWithAuth(`/courses?filters[slug][$eq]=${slug}&populate[0]=instructor&populate[1]=lessons${baseQuery}`, { cache: 'no-store' });
+    let res = await fetchWithAuth(`/courses?filters[slug][$eq]=${slug}&populate[0]=instructor&populate[1]=lessons`, { cache: 'no-store', headers });
     
     // If not found by slug, fallback to documentId
     if (!res.data || res.data.length === 0) {
-      res = await fetchWithAuth(`/courses?filters[documentId][$eq]=${slug}&populate[0]=instructor&populate[1]=lessons${baseQuery}`, { cache: 'no-store' });
+      res = await fetchWithAuth(`/courses?filters[documentId][$eq]=${slug}&populate[0]=instructor&populate[1]=lessons`, { cache: 'no-store', headers });
     }
     
     return res.data?.[0] || null;

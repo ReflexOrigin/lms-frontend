@@ -9,7 +9,7 @@ export default async function ContentProgress() {
   
   try {
     const [coursesRes, enrollmentsRes] = await Promise.all([
-      fetchWithAuth('/api/courses?populate=lessons&managerView=true'),
+      fetchWithAuth('/api/courses?populate=lessons', { headers: { 'x-manager-view': 'true' } }),
       fetchWithAuth('/api/enrollments?populate=student,course')
     ]);
 

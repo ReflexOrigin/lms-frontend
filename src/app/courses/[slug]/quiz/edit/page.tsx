@@ -30,7 +30,7 @@ export default function EditQuizPage(props: { params: Promise<{ slug: string }> 
         if (!cData) throw new Error('Course not found');
         setCourse(cData);
         
-        const qData = await getQuizForCourse(cData.documentId);
+        const qData = await getQuizForCourse(cData.documentId, true);
         setQuiz(qData);
       } catch (err: any) {
         setError(err.message || 'Failed to load data');

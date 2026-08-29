@@ -6,7 +6,8 @@ import { fetchWithAuth } from "@/lib/api";
 import CourseFilter from "./CourseFilter";
 import DeleteCourseButton from "./DeleteCourseButton";
 
-export default async function AdminCourses({ searchParams }: { searchParams: any }) {
+export default async function AdminCourses(props: { searchParams: Promise<any> }) {
+  const searchParams = await props.searchParams;
   const query = searchParams?.q?.toLowerCase() || "";
   const statusFilter = searchParams?.status || "all";
   const instructorFilter = searchParams?.instructor || "all";
@@ -14,7 +15,7 @@ export default async function AdminCourses({ searchParams }: { searchParams: any
 
   let courses: any[] = [];
   try {
-    const res = await fetchWithAuth('/api/courses?populate=instructor,lessons,category');
+    const res = await fetchWithAuth('/api/courses?populate=instructor,lessons,category', { headers: { 'x-manager-view': 'true' } });
     if (res.ok) {
       courses = (await res.json()).data || [];
     }
@@ -43,7 +44,7 @@ export default async function AdminCourses({ searchParams }: { searchParams: any
     <Page
       title="Course Management"
       subtitle="Every course on the platform, across all instructors."
-      actions={<NewButton label="Create course" />}
+      actions={<Link href="/courses/create"><NewButton label="Create course" /></Link>}
     >
       <Card className="overflow-hidden">
         <CourseFilter 

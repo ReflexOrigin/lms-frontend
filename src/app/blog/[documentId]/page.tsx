@@ -83,7 +83,7 @@ export default async function BlogPostPage(props: { params: Promise<{ documentId
             <div>
               <p className="font-bold text-gray-900">{post.author?.username || 'Admin'}</p>
               <p className="text-sm text-gray-500">
-                {new Date(post.publishedAt || post.createdAt).toLocaleDateString(undefined, {
+                {new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
@@ -102,6 +102,7 @@ export default async function BlogPostPage(props: { params: Promise<{ documentId
               src={post.coverImage} 
               alt={post.title}
               className="w-full h-full object-cover"
+              suppressHydrationWarning
             />
           </div>
         </div>

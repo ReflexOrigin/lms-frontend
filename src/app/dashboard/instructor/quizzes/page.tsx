@@ -7,7 +7,7 @@ import { fetchWithAuth } from "@/lib/api";
 export default async function InstructorQuizzes() {
   let quizzes: any[] = [];
   try {
-    const res = await fetchWithAuth('/api/quizzes?populate[0]=course&managerView=true');
+    const res = await fetchWithAuth('/api/quizzes?populate[0]=course', { headers: { 'x-manager-view': 'true' } });
     if (res.ok) {
       quizzes = (await res.json()).data || [];
     }

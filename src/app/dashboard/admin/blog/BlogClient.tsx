@@ -7,7 +7,7 @@ import { Avatar, Badge, Button, Card, useToast } from "@/components/ui";
 import { deleteBlogPost, publishBlogPost, unpublishBlogPost } from "@/lib/actions/blog";
 import Link from "next/link";
 
-export default function BlogClient({ initialPosts }: { initialPosts: any[] }) {
+export default function BlogClient({ initialPosts, basePath = '/dashboard/admin/blog' }: { initialPosts: any[], basePath?: string }) {
   const toast = useToast();
   const [posts, setPosts] = useState<any[]>(initialPosts);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -52,7 +52,7 @@ export default function BlogClient({ initialPosts }: { initialPosts: any[] }) {
       title="Blog Management"
       subtitle={`${posts.length} posts · ${published} published`}
       actions={
-        <Link href="/dashboard/admin/blog/new">
+        <Link href={`${basePath}/new`}>
           <NewButton label="New post" />
         </Link>
       }
@@ -108,7 +108,7 @@ export default function BlogClient({ initialPosts }: { initialPosts: any[] }) {
                     <Link href={`/blog/${p.slug || p.documentId}`} target="_blank" className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
                       <Eye size={16} />
                     </Link>
-                    <Link href={`/dashboard/admin/blog/${p.documentId}`} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+                    <Link href={`${basePath}/${p.documentId}`} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
                       <Pencil size={16} />
                     </Link>
                     <button onClick={() => handleDelete(p.documentId)} className="w-8 h-8 rounded-lg hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] flex items-center justify-center text-muted-foreground">

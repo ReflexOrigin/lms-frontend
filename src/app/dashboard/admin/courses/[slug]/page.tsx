@@ -3,13 +3,13 @@ import { EmptyState } from "@/components/ui";
 import { fetchWithAuth } from "@/lib/api";
 import AdminCourseClient from "./AdminCourseClient";
 
-export default async function AdminCourseDetail({ params }: { params: { slug: string } }) {
-  const documentId = params.slug;
+export default async function AdminCourseDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug: documentId } = await params;
   let course = null;
   let enrollments = [];
 
   try {
-    const courseRes = await fetchWithAuth(`/api/courses/${documentId}?populate=instructor,lessons,category`);
+    const courseRes = await fetchWithAuth(`/api/courses/${documentId}?populate=instructor,lessons,category&status=draft`);
     if (courseRes.ok) {
       course = (await courseRes.json()).data;
     }

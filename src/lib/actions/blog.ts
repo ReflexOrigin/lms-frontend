@@ -63,20 +63,26 @@ export async function deleteBlogPost(documentId: string) {
 }
 
 export async function publishBlogPost(documentId: string) {
-  const res = await fetchWithAuth(`/api/blog-posts/${documentId}/actions/publish`, {
+  const res = await fetchWithAuth(`/api/blog-posts/${documentId}/publish`, {
     method: 'POST',
   });
-  if (!res.ok) throw new Error('Failed to publish post');
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(`Failed to publish post: ${JSON.stringify(errorData)}`);
+  }
   revalidatePath('/dashboard/admin/blog');
   revalidatePath('/dashboard/manager/blog');
   return await res.json();
 }
 
 export async function unpublishBlogPost(documentId: string) {
-  const res = await fetchWithAuth(`/api/blog-posts/${documentId}/actions/unpublish`, {
+  const res = await fetchWithAuth(`/api/blog-posts/${documentId}/unpublish`, {
     method: 'POST',
   });
-  if (!res.ok) throw new Error('Failed to unpublish post');
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(`Failed to unpublish post: ${JSON.stringify(errorData)}`);
+  }
   revalidatePath('/dashboard/admin/blog');
   revalidatePath('/dashboard/manager/blog');
   return await res.json();

@@ -8,7 +8,7 @@ export default async function InstructorLessons() {
   let myCourses: any[] = [];
   try {
     // Fetch courses and populate their lessons. getCourses handles the managerView flag.
-    myCourses = await getCourses('managerView=true');
+    myCourses = await getCourses('', true);
   } catch (error) {
     console.error("Failed to fetch instructor lessons", error);
   }
