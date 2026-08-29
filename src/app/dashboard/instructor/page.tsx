@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Award, TrendingUp, Users } from "lucide-react";
 import { Page } from "@/components/Page";
 import { Badge, Button, Card, CardHeader, StatCard, StatusPill } from "@/components/ui";
-import { getCourses } from "@/lib/services/courseService";
+import { getCourses } from "@/lib/actions/course";
 import { getCurrentUser } from "@/lib/services/userService";
 
 export default async function InstructorDashboard() {

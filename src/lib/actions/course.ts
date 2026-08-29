@@ -45,7 +45,7 @@ async function fetchWithAuth(path: string, options: RequestInit = {}) {
 
 export async function getCourses(filters = '', managerView = false) {
   try {
-    const headers = managerView ? { 'x-manager-view': 'true' } : {};
+    const headers = managerView ? { 'x-manager-view': 'true' } as HeadersInit : undefined;
     // Populate instructor and lessons by default for course cards
     const res = await fetchWithAuth(`/courses?populate[0]=instructor&populate[1]=lessons${filters ? '&' + filters : ''}`, { cache: 'no-store', headers });
     return res.data || [];
@@ -57,7 +57,7 @@ export async function getCourses(filters = '', managerView = false) {
 
 export async function getCourse(slug: string, managerView = false) {
   try {
-    const headers = managerView ? { 'x-manager-view': 'true' } : {};
+    const headers = managerView ? { 'x-manager-view': 'true' } as HeadersInit : undefined;
     // Populate instructor, lessons. Try slug first.
     let res = await fetchWithAuth(`/courses?filters[slug][$eq]=${slug}&populate[0]=instructor&populate[1]=lessons`, { cache: 'no-store', headers });
     

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { FileText, ListChecks, TrendingUp, Users } from "lucide-react";
 import { Page } from "@/components/Page";
 import { Button, Card, StatusPill } from "@/components/ui";
-import { getCourses } from "@/lib/services/courseService";
+import { getCourses } from "@/lib/actions/course";
 
 export default async function InstructorCourses() {
   const myCourses = await getCourses('', true); // Backend auto-filters for the instructor

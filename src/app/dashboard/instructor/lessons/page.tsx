@@ -2,7 +2,7 @@ import Link from "next/link";
 import { FileText, Pencil, PlayCircle, Plus, Video } from "lucide-react";
 import { Page } from "@/components/Page";
 import { Button, Card, StatusPill } from "@/components/ui";
-import { getCourses } from "@/lib/services/courseService";
+import { getCourses } from "@/lib/actions/course";
 
 export default async function InstructorLessons() {
   let myCourses: any[] = [];
