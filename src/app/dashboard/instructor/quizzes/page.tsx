@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ListChecks, Pencil, Plus } from "lucide-react";
 import { Page } from "@/components/Page";
 import { Button, Card, StatusPill } from "@/components/ui";
@@ -19,9 +20,11 @@ export default async function InstructorQuizzes() {
       title="Quiz Management"
       subtitle="Assessments across your own courses."
       actions={
-        <Button>
-          <Plus size={16} /> New quiz
-        </Button>
+        <Link href="/dashboard/instructor/courses">
+          <Button>
+            <Plus size={16} /> New quiz
+          </Button>
+        </Link>
       }
     >
       <Card className="overflow-x-auto">
@@ -47,12 +50,12 @@ export default async function InstructorQuizzes() {
                 <td className="px-3 py-3 text-muted-foreground">{q.course?.title || 'General'}</td>
                 <td className="px-3 py-3 text-right tabular-nums">{q.questions?.length || 0}</td>
                 <td className="px-3 py-3">
-                  <StatusPill status={q.publishedAt ? 'published' : 'draft'} />
+                  <StatusPill status={q.course?.publishedAt ? 'published' : 'draft'} />
                 </td>
                 <td className="px-5 py-3 text-right">
-                  <button className="w-8 h-8 rounded-lg hover:bg-muted inline-flex items-center justify-center text-muted-foreground">
+                  <Link href={`/courses/${q.course?.slug}/quiz/edit`} className="w-8 h-8 rounded-lg hover:bg-muted inline-flex items-center justify-center text-muted-foreground">
                     <Pencil size={16} />
-                  </button>
+                  </Link>
                 </td>
               </tr>
             )) : (

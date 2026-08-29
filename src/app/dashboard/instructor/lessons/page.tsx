@@ -18,9 +18,11 @@ export default async function InstructorLessons() {
       title="Lesson Management"
       subtitle="Manage lessons for your own courses."
       actions={
-        <Button>
-          <Plus size={16} /> New lesson
-        </Button>
+        <Link href="/dashboard/instructor/courses">
+          <Button>
+            <Plus size={16} /> New lesson
+          </Button>
+        </Link>
       }
     >
       {myCourses.length > 0 ? myCourses.map((course) => (
@@ -42,12 +44,12 @@ export default async function InstructorLessons() {
                   <span className="text-xs text-muted-foreground hidden sm:block">{l.duration || '0:00'}</span>
                   <StatusPill status={l.publishedAt ? 'published' : 'draft'} />
                   <div className="flex gap-1">
-                    <button className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+                    <Link href={`/courses/${course.slug}/lessons/${l.documentId}`} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
                       <PlayCircle size={16} />
-                    </button>
-                    <button className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
+                    </Link>
+                    <Link href={`/courses/${course.slug}/lessons/${l.documentId}/edit`} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground">
                       <Pencil size={16} />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
