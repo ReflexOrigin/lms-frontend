@@ -8,7 +8,15 @@ export default async function InstructorCourses() {
   const myCourses = await getCourses('', true); // Backend auto-filters for the instructor
 
   return (
-    <Page title="My Courses" subtitle="Courses you own and teach. You can only manage your own.">
+    <Page 
+      title="My Courses" 
+      subtitle="Courses you own and teach. You can only manage your own."
+      actions={
+        <Link href="/dashboard/instructor/courses/new">
+          <Button>Create Course</Button>
+        </Link>
+      }
+    >
       {myCourses.length > 0 ? (
         <Card className="divide-y divide-border overflow-hidden">
           {myCourses.map((c: any) => (
